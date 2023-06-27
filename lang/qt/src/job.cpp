@@ -94,7 +94,12 @@ void QGpgME::setJobPrivate(const Job *job, std::unique_ptr<JobPrivate> d)
     ref = std::move(d);
 }
 
-QGpgME::JobPrivate *QGpgME::getJobPrivate(const Job *job)
+const QGpgME::JobPrivate *QGpgME::getJobPrivate(const Job *job)
+{
+    return d_func()->operator[](job).get();
+}
+
+QGpgME::JobPrivate *QGpgME::getJobPrivate(Job *job)
 {
     return d_func()->operator[](job).get();
 }
@@ -137,11 +142,18 @@ GpgME::Context *QGpgME::Job::context(QGpgME::Job *job)
     return QGpgME::g_context_map.value (job, nullptr);
 }
 
+GpgME::Error QGpgME::Job::startIt()
+{
+    auto d = getJobPrivate(this);
+    Q_ASSERT(d && "This Job class has no JobPrivate class");
+    return d->startIt();
+}
+
 void QGpgME::Job::startNow()
 {
     auto d = getJobPrivate(this);
     Q_ASSERT(d && "This Job class has no JobPrivate class");
-    d->start();
+    d->startNow();
 }
 
 #define make_job_subclass_ext(x,y)                \

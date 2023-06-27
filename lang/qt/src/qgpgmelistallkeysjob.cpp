@@ -77,7 +77,13 @@ public:
     ~QGpgMEListAllKeysJobPrivate() override = default;
 
 private:
-    void start() override
+    GpgME::Error startIt() override
+    {
+        Q_ASSERT(!"Not supported by this Job class.");
+        return Error::fromCode(GPG_ERR_NOT_SUPPORTED);
+    }
+
+    void startNow() override
     {
         q->run();
     }
