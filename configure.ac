@@ -32,7 +32,7 @@ min_automake_version="1.14"
 m4_define([mym4_package],[gpgme])
 m4_define([mym4_major], [1])
 m4_define([mym4_minor], [21])
-m4_define([mym4_micro], [0])
+m4_define([mym4_micro], [1])
 
 # Below is m4 magic to extract and compute the git revision number,
 # the decimalized short revision number, a beta version string and a
@@ -53,20 +53,20 @@ AC_INIT([mym4_package],[mym4_version],[https://bugs.gnupg.org])
 #   (Interfaces added:			AGE++)
 #   (Interfaces removed:		AGE=0)
 #
-LIBGPGME_LT_CURRENT=40
-LIBGPGME_LT_AGE=29
+LIBGPGME_LT_CURRENT=41
+LIBGPGME_LT_AGE=30
 LIBGPGME_LT_REVISION=0
 
 # If there is an ABI break in gpgmepp or qgpgme also bump the
 # version in IMPORTED_LOCATION in the GpgmeppConfig-w32.cmake.in.in
 
-LIBGPGMEPP_LT_CURRENT=23
-LIBGPGMEPP_LT_AGE=17
+LIBGPGMEPP_LT_CURRENT=24
+LIBGPGMEPP_LT_AGE=18
 LIBGPGMEPP_LT_REVISION=0
 
-LIBQGPGME_LT_CURRENT=17
-LIBQGPGME_LT_AGE=2
-LIBQGPGME_LT_REVISION=1
+LIBQGPGME_LT_CURRENT=18
+LIBQGPGME_LT_AGE=3
+LIBQGPGME_LT_REVISION=0
 ################################################
 
 AC_SUBST(LIBGPGME_LT_CURRENT)
