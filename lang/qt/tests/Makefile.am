@@ -51,10 +51,10 @@ LDADD = ../../cpp/src/libgpgmepp.la ../src/libqgpgme.la \
         ../../../src/libgpgme.la @GPGME_QT5_LIBS@ @GPG_ERROR_LIBS@ \
         @GPGME_QT5TEST_LIBS@ @LDADD_FOR_TESTS_KLUDGE@ -lstdc++
 
-AM_CPPFLAGS = -I$(top_srcdir)/lang/cpp/src -I$(top_builddir)/src \
+AM_CPPFLAGS = -I$(top_srcdir)/lang/qt/src -I$(top_srcdir)/lang/cpp/src \
+              -I$(top_builddir)/src \
               @GPG_ERROR_CFLAGS@ @GPGME_QT5_CFLAGS@ @GPG_ERROR_CFLAGS@ \
               @LIBASSUAN_CFLAGS@ @GPGME_QT5TEST_CFLAGS@ -DBUILDING_QGPGME \
-              -I$(top_srcdir)/lang/qt/src \
               -DTOP_SRCDIR="$(top_srcdir)"
 endif
 if WANT_QT6
@@ -62,10 +62,10 @@ LDADD = ../../cpp/src/libgpgmepp.la ../src/libqgpgmeqt6.la \
         ../../../src/libgpgme.la @GPGME_QT6_LIBS@ @GPG_ERROR_LIBS@ \
         @GPGME_QT6TEST_LIBS@ @LDADD_FOR_TESTS_KLUDGE@ -lstdc++
 
-AM_CPPFLAGS = -I$(top_srcdir)/lang/cpp/src -I$(top_builddir)/src \
+AM_CPPFLAGS = -I$(top_srcdir)/lang/qt/src -I$(top_srcdir)/lang/cpp/src \
+              -I$(top_builddir)/src \
               @GPG_ERROR_CFLAGS@ @GPGME_QT6_CFLAGS@ @GPG_ERROR_CFLAGS@ \
               @LIBASSUAN_CFLAGS@ @GPGME_QT6TEST_CFLAGS@ -DBUILDING_QGPGME \
-              -I$(top_srcdir)/lang/qt/src \
               -DTOP_SRCDIR="$(top_srcdir)"
 endif
 
@@ -97,6 +97,7 @@ run_keyformailboxjob_SOURCES = run-keyformailboxjob.cpp
 run_receivekeysjob_SOURCES = run-receivekeysjob.cpp
 run_refreshkeysjob_SOURCES = run-refreshkeysjob.cpp
 run_signarchivejob_SOURCES = run-signarchivejob.cpp
+run_wkdrefreshjob_SOURCES = run-wkdrefreshjob.cpp
 
 nodist_t_keylist_SOURCES = $(moc_files)
 
@@ -112,7 +113,8 @@ noinst_PROGRAMS = \
 	run-decryptverifyarchivejob \
 	run-encryptarchivejob \
 	run-importjob run-exportjob run-receivekeysjob run-refreshkeysjob \
-	run-signarchivejob
+	run-signarchivejob \
+	run-wkdrefreshjob
 
 
 CLEANFILES = secring.gpg pubring.gpg pubring.kbx trustdb.gpg dirmngr.conf \

@@ -31,7 +31,7 @@ min_automake_version="1.14"
 # for the LT versions.
 m4_define([mym4_package],[gpgme])
 m4_define([mym4_major], [1])
-m4_define([mym4_minor], [21])
+m4_define([mym4_minor], [22])
 m4_define([mym4_micro], [1])
 
 # Below is m4 magic to extract and compute the git revision number,
@@ -53,19 +53,19 @@ AC_INIT([mym4_package],[mym4_version],[https://bugs.gnupg.org])
 #   (Interfaces added:			AGE++)
 #   (Interfaces removed:		AGE=0)
 #
-LIBGPGME_LT_CURRENT=41
-LIBGPGME_LT_AGE=30
+LIBGPGME_LT_CURRENT=42
+LIBGPGME_LT_AGE=31
 LIBGPGME_LT_REVISION=0
 
 # If there is an ABI break in gpgmepp or qgpgme also bump the
 # version in IMPORTED_LOCATION in the GpgmeppConfig-w32.cmake.in.in
 
-LIBGPGMEPP_LT_CURRENT=24
-LIBGPGMEPP_LT_AGE=18
+LIBGPGMEPP_LT_CURRENT=25
+LIBGPGMEPP_LT_AGE=19
 LIBGPGMEPP_LT_REVISION=0
 
-LIBQGPGME_LT_CURRENT=18
-LIBQGPGME_LT_AGE=3
+LIBQGPGME_LT_CURRENT=19
+LIBQGPGME_LT_AGE=4
 LIBQGPGME_LT_REVISION=0
 ################################################
 
@@ -205,6 +205,44 @@ case "${host}" in
 esac
 
 AM_CONDITIONAL(HAVE_LD_VERSION_SCRIPT, test "$have_ld_version_script" = "yes")
+
+#
+# Specify how we support our local modification of libtool for Windows
+# 64-bit.  Options are:
+#
+# (1) apply: when appying patch fails, it results failure of entire build
+# (2) never: never apply the patch (no try)
+# (3) try: use patched if it goes well, use original if fails
+#
+AC_ARG_WITH([libtool-modification],
+  AS_HELP_STRING([--with-libtool-modification=apply|never|try],
+                 [how to handle libtool modification (default=apply)]),
+                 build_libtool_modification=$withval,
+                 build_libtool_modification=apply)
+
+#
+# Apply a patch (locally maintained one of ours) to libtool
+#
+case $host in
+  x86_64-*mingw32*)
+AC_CONFIG_COMMANDS([libtool-patch],[[
+  if test "$build_selection" = never; then
+    echo "patch not applied"
+  elif (mv -f libtool libtool.orig; \
+        sed -f $srcdir/build-aux/libtool-patch.sed libtool.orig >libtool); then
+    echo "applied successfully"
+  elif test "$build_selection" = try; then
+    mv -f libtool.orig libtool
+    echo "patch failed, thus, using original"
+  else
+    echo "patch failed"
+    as_fn_exit 1
+  fi
+]],[build_selection=$build_libtool_modification])
+  ;;
+  *)
+  ;;
+esac
 
 GPG_DEFAULT=no
 GPGSM_DEFAULT=no
