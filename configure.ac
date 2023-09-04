@@ -31,8 +31,8 @@ min_automake_version="1.14"
 # for the LT versions.
 m4_define([mym4_package],[gpgme])
 m4_define([mym4_major], [1])
-m4_define([mym4_minor], [22])
-m4_define([mym4_micro], [1])
+m4_define([mym4_minor], [23])
+m4_define([mym4_micro], [0])
 
 # Below is m4 magic to extract and compute the git revision number,
 # the decimalized short revision number, a beta version string and a
@@ -216,9 +216,9 @@ AM_CONDITIONAL(HAVE_LD_VERSION_SCRIPT, test "$have_ld_version_script" = "yes")
 #
 AC_ARG_WITH([libtool-modification],
   AS_HELP_STRING([--with-libtool-modification=apply|never|try],
-                 [how to handle libtool modification (default=apply)]),
+                 [how to handle libtool modification (default=never)]),
                  build_libtool_modification=$withval,
-                 build_libtool_modification=apply)
+                 build_libtool_modification=never)
 
 #
 # Apply a patch (locally maintained one of ours) to libtool
