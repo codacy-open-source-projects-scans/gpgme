@@ -55,6 +55,7 @@ show_usage (int ex)
          "  --tofu           use GPGME_KEYLIST_MODE_TOFU\n"
          "  --sig-notations  use GPGME_KEYLIST_MODE_SIG_NOTATIONS\n"
          "  --ephemeral      use GPGME_KEYLIST_MODE_EPHEMERAL\n"
+         "  --v5fpr          use GPGME_KEYLIST_MODE_V5FPR\n"
          "  --validate       use GPGME_KEYLIST_MODE_VALIDATE\n"
          "  --import         import all keys\n"
          "  --offline        use offline mode\n"
@@ -184,6 +185,11 @@ main (int argc, char **argv)
           mode |= GPGME_KEYLIST_MODE_WITH_SECRET;
           argc--; argv++;
         }
+      else if (!strcmp (*argv, "--v5fpr"))
+        {
+          mode |= GPGME_KEYLIST_MODE_WITH_V5FPR;
+          argc--; argv++;
+        }
       else if (!strcmp (*argv, "--import"))
         {
           import = 1;
@@ -305,6 +311,8 @@ main (int argc, char **argv)
       for (nsub=0; subkey; subkey = subkey->next, nsub++)
         {
           printf ("fpr   %2d: %s\n", nsub, nonnull (subkey->fpr));
+          if (subkey->v5fpr)
+            printf ("v5fpr %2d: %s\n", nsub, nonnull (subkey->v5fpr));
           if (subkey->keygrip)
             printf ("grip  %2d: %s\n", nsub, subkey->keygrip);
           if (subkey->curve)
