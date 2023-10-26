@@ -32,7 +32,7 @@ min_automake_version="1.14"
 m4_define([mym4_package],[gpgme])
 m4_define([mym4_major], [1])
 m4_define([mym4_minor], [23])
-m4_define([mym4_micro], [0])
+m4_define([mym4_micro], [1])
 
 # Below is m4 magic to extract and compute the git revision number,
 # the decimalized short revision number, a beta version string and a
@@ -53,19 +53,19 @@ AC_INIT([mym4_package],[mym4_version],[https://bugs.gnupg.org])
 #   (Interfaces added:			AGE++)
 #   (Interfaces removed:		AGE=0)
 #
-LIBGPGME_LT_CURRENT=42
-LIBGPGME_LT_AGE=31
+LIBGPGME_LT_CURRENT=43
+LIBGPGME_LT_AGE=32
 LIBGPGME_LT_REVISION=0
 
 # If there is an ABI break in gpgmepp or qgpgme also bump the
 # version in IMPORTED_LOCATION in the GpgmeppConfig-w32.cmake.in.in
 
-LIBGPGMEPP_LT_CURRENT=25
-LIBGPGMEPP_LT_AGE=19
+LIBGPGMEPP_LT_CURRENT=26
+LIBGPGMEPP_LT_AGE=20
 LIBGPGMEPP_LT_REVISION=0
 
-LIBQGPGME_LT_CURRENT=19
-LIBQGPGME_LT_AGE=4
+LIBQGPGME_LT_CURRENT=20
+LIBQGPGME_LT_AGE=5
 LIBQGPGME_LT_REVISION=0
 ################################################
 
@@ -337,6 +337,25 @@ if test x$fixed_search_path != x ; then
   AC_DEFINE_UNQUOTED(FIXED_SEARCH_PATH, "$fixed_search_path",
                     [Locate binaries only via this PATH])
 fi
+
+# Option --enable-no-direct-extern-access
+#
+# Some distributions build Qt 6 with -mno-direct-extern-access. Libraries and
+# applications using Qt then must also be build with this flag. As workaround
+# for a bug in Qt's pkgconfig files which don't have this flag we allow
+# building with this flag explicitly.
+AC_LANG_PUSH(C++)
+AX_CHECK_COMPILE_FLAG([-mno-direct-extern-access],
+                      [have_no_direct_extern_access="yes"],
+                      [have_no_direct_extern_access="no"],
+                      [-Werror])
+AC_LANG_POP()
+AC_ARG_ENABLE([no-direct-extern-access],
+              AS_HELP_STRING([--enable-no-direct-extern-access],
+                             [build Qt 6 bindinds with
+                              -mno-direct-extern-access]),
+              [use_no_direct_extern_access="$enableval"],
+              [use_no_direct_extern_access=""])
 
 
 # Note: You need to declare all possible languages also in

@@ -32,7 +32,28 @@ AC_DEFUN([FIND_QT6],
       have_qt6_libs="no";
     fi
   fi
+
   if test "$have_qt6_libs" = "yes"; then
+    if test "$have_no_direct_extern_access" = yes; then
+      if test -z "$use_no_direct_extern_access" && test "$have_w32_system" != yes; then
+        mkspecsdir=$($PKG_CONFIG --variable mkspecsdir Qt6Platform)
+        if test -n "$mkspecsdir"; then
+          AC_MSG_CHECKING([whether Qt was built with -mno-direct-extern-access])
+          if grep -q "QT_CONFIG .* no_direct_extern_access" $mkspecsdir/qconfig.pri; then
+            use_no_direct_extern_access="yes"
+          else
+            use_no_direct_extern_access="no"
+          fi
+          AC_MSG_RESULT([$use_no_direct_extern_access])
+        else
+          AC_MSG_WARN([Failed to determine Qt's mkspecs directory. Cannot check its build configuration.])
+        fi
+      fi
+      if test "$use_no_direct_extern_access" = yes; then
+        GPGME_QT6_CFLAGS="$GPGME_QT6_CFLAGS -mno-direct-extern-access"
+      fi
+    fi
+
     dnl Check that a binary can actually be build with this qt.
     dnl pkg-config may be set up in a way that it looks also for libraries
     dnl of the build system and not only for the host system. In that case
@@ -41,11 +62,10 @@ AC_DEFUN([FIND_QT6],
     OLDCPPFLAGS=$CPPFLAGS
     OLDLIBS=$LIBS
 
-    # try building without -fPIC
     CPPFLAGS=$GPGME_QT6_CFLAGS
     LIBS=$GPGME_QT6_LIBS
     AC_LANG_PUSH(C++)
-    AC_MSG_CHECKING([whether a simple qt program can be built without -fPIC])
+    AC_MSG_CHECKING([whether a simple Qt program can be built])
     AC_LINK_IFELSE([AC_LANG_SOURCE([
       #include <QCoreApplication>
       int main (int argc, char **argv) {
@@ -54,25 +74,6 @@ AC_DEFUN([FIND_QT6],
     }])], [have_qt6_libs='yes'], [have_qt6_libs='no'])
     AC_MSG_RESULT([$have_qt6_libs])
     AC_LANG_POP()
-
-    if test "$have_qt6_libs" = "no" -a "$have_w32_system" != yes; then
-      # try building with -fPIC
-      CPPFLAGS="$GPGME_QT6_CFLAGS -fPIC"
-      LIBS=$GPGME_QT6_LIBS
-      AC_LANG_PUSH(C++)
-      AC_MSG_CHECKING([whether a simple qt program can be built with -fPIC])
-      AC_LINK_IFELSE([AC_LANG_SOURCE([
-        #include <QCoreApplication>
-        int main (int argc, char **argv) {
-        QCoreApplication app(argc, argv);
-        app.exec();
-      }])], [
-        have_qt6_libs='yes'
-        GPGME_QT6_CFLAGS="$GPGME_QT6_CFLAGS -fPIC"
-      ], [have_qt6_libs='no'])
-      AC_MSG_RESULT([$have_qt6_libs])
-      AC_LANG_POP()
-    fi
 
     CPPFLAGS=$OLDCPPFLAGS
     LIBS=$OLDLIBS
