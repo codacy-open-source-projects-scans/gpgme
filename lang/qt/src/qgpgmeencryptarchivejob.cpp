@@ -44,6 +44,7 @@
 #include "encryptarchivejob_p.h"
 #include "filelistdataprovider.h"
 #include "qgpgme_debug.h"
+#include "util.h"
 
 #include <QFile>
 
@@ -104,20 +105,6 @@ static QGpgMEEncryptArchiveJob::result_type encrypt(Context *ctx,
     flags = static_cast<Context::EncryptionFlags>(flags | Context::EncryptArchive);
     const auto encryptionResult = ctx->encrypt(recipients, indata, outdata, flags);
 
-#ifdef Q_OS_WIN
-    const auto outputFileName = QString::fromUtf8(outdata.fileName());
-#else
-    const auto outputFileName = QFile::decodeName(outdata.fileName());
-#endif
-    if (!outputFileName.isEmpty() && encryptionResult.error().code()) {
-        // ensure that the output file is removed if the operation was canceled or failed
-        if (QFile::exists(outputFileName)) {
-            qCDebug(QGPGME_LOG) << __func__ << "Removing output file" << outputFileName << "after error or cancel";
-            if (!QFile::remove(outputFileName)) {
-                qCDebug(QGPGME_LOG) << __func__ << "Removing output file" << outputFileName << "failed";
-            }
-        }
-    }
     Error ae;
     const QString log = _detail::audit_log_as_html(ctx, ae);
     return std::make_tuple(encryptionResult, log, ae);
@@ -142,18 +129,30 @@ static QGpgMEEncryptArchiveJob::result_type encrypt_to_io_device(Context *ctx,
 static QGpgMEEncryptArchiveJob::result_type encrypt_to_filename(Context *ctx,
                                                                 const std::vector<Key> &recipients,
                                                                 const std::vector<QString> &paths,
-                                                                const QString &outputFile,
+                                                                const QString &outputFileName,
                                                                 Context::EncryptionFlags flags,
                                                                 const QString &baseDirectory)
 {
+    PartialFileGuard partFileGuard{outputFileName};
+    if (partFileGuard.tempFileName().isEmpty()) {
+        return std::make_tuple(EncryptionResult{Error::fromCode(GPG_ERR_EEXIST)}, QString{}, Error{});
+    }
+
     Data outdata;
 #ifdef Q_OS_WIN
-    outdata.setFileName(outputFile.toUtf8().constData());
+    outdata.setFileName(partFileGuard.tempFileName().toUtf8().constData());
 #else
-    outdata.setFileName(QFile::encodeName(outputFile).constData());
+    outdata.setFileName(QFile::encodeName(partFileGuard.tempFileName()).constData());
 #endif
 
-    return encrypt(ctx, recipients, paths, outdata, flags, baseDirectory);
+    const auto result = encrypt(ctx, recipients, paths, outdata, flags, baseDirectory);
+    const auto &encryptionResult = std::get<0>(result);
+    if (!encryptionResult.error().code()) {
+        // the operation succeeded -> save the result under the requested file name
+        partFileGuard.commit();
+    }
+
+    return result;
 }
 
 GpgME::Error QGpgMEEncryptArchiveJob::start(const std::vector<GpgME::Key> &recipients,
