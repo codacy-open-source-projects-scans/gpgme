@@ -55,8 +55,6 @@ std::vector<std::string> toStrings(const QStringList &l);
 
 QStringList toFingerprints(const std::vector<GpgME::Key> &keys);
 
-void removeFile(const QString &fileName);
-
 /**
  * Helper for using a temporary "part" file for writing a result to, similar
  * to what browsers do when downloading files.

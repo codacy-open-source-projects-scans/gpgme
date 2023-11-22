@@ -1,8 +1,8 @@
 /*
-    debug.cpp
+    cleaner.h
 
     This file is part of qgpgme, the Qt API binding for gpgme
-    Copyright (c) 2020 g10 Code GmbH
+    Copyright (c) 2023 g10 Code GmbH
     Software engineering by Ingo Klöcker <dev@ingo-kloecker.de>
 
     QGpgME is free software; you can redistribute it and/or
@@ -31,25 +31,30 @@
     your version.
 */
 
-#ifdef HAVE_CONFIG_H
- #include "config.h"
-#endif
+#ifndef __QGPGME_CLEANER_H__
+#define __QGPGME_CLEANER_H__
 
-#include "error.h"
-#include "debug.h"
+#include <QObject>
+#include <QString>
+#include <QTimer>
 
-#include <QDebug>
-
-QDebug operator<<(QDebug debug, const GpgME::Error &err)
+/** Helper class that tries to remove files at regular intervals and on destruction. */
+class Cleaner : public QObject
 {
-#ifdef Q_OS_WIN
-    // On Windows, we tell libgpg-error to return (translated) error messages as UTF-8
-    const auto errAsString = QString::fromUtf8(err.asString());
-#else
-    const auto errAsString = QString::fromLocal8Bit(err.asString());
-#endif
-    const bool oldSetting = debug.autoInsertSpaces();
-    debug.nospace() << errAsString << " (code: " << err.code() << ", source: " << err.source() << ")";
-    debug.setAutoInsertSpaces(oldSetting);
-    return debug.maybeSpace();
-}
+    Q_OBJECT
+public:
+    /** Tries to remove the file. If this fails it creates a Cleaner for the file. */
+    static void removeFile(const QString &filePath);
+
+private:
+    explicit Cleaner(const QString &filePath, QObject *parent=nullptr);
+    ~Cleaner() override;
+
+    Q_DISABLE_COPY_MOVE(Cleaner)
+
+private:
+    QString mFilePath;
+    QTimer mTimer;
+};
+
+#endif // __QGPGME_CLEANER_H__
