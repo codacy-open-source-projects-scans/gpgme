@@ -36,6 +36,7 @@ qgpgme_sources = \
     dataprovider.cpp \
     debug.cpp \
     decryptverifyarchivejob.cpp \
+    decryptverifyjob.cpp \
     encryptarchivejob.cpp \
     filelistdataprovider.cpp \
     job.cpp multideletejob.cpp qgpgmeadduseridjob.cpp \
@@ -65,8 +66,10 @@ qgpgme_sources = \
     signarchivejob.cpp \
     signencryptjob.cpp \
     signencryptarchivejob.cpp \
+    signjob.cpp \
     dn.cpp cryptoconfig.cpp wkdlookupresult.cpp \
     util.cpp \
+    verifyopaquejob.cpp \
     wkdrefreshjob.cpp
 
 # If you add one here make sure that you also add one in camelcase
@@ -179,6 +182,7 @@ private_qgpgme_headers = \
     changeexpiryjob_p.h \
     cleaner.h \
     decryptverifyarchivejob_p.h \
+    decryptverifyjob_p.h \
     encryptarchivejob_p.h \
     encryptjob_p.h \
     importjob_p.h \
@@ -226,8 +230,10 @@ private_qgpgme_headers = \
     signarchivejob_p.h \
     signencryptjob_p.h \
     signencryptarchivejob_p.h \
+    signjob_p.h \
     threadedjobmixin.h \
     util.h \
+    verifyopaquejob_p.h \
     wkdrefreshjob_p.h
 
 qgpgme_moc_sources = \

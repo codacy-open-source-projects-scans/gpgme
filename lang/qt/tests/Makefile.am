@@ -89,14 +89,18 @@ t_wkdlookup_SOURCES = t-wkdlookup.cpp $(support_src)
 t_import_SOURCES = t-import.cpp $(support_src)
 t_revokekey_SOURCES = t-revokekey.cpp $(support_src)
 t_setprimaryuserid_SOURCES = t-setprimaryuserid.cpp $(support_src)
+run_decryptverifyjob_SOURCES = run-decryptverifyjob.cpp
 run_decryptverifyarchivejob_SOURCES = run-decryptverifyarchivejob.cpp
 run_encryptarchivejob_SOURCES = run-encryptarchivejob.cpp
+run_encryptjob_SOURCES = run-encryptjob.cpp
 run_exportjob_SOURCES = run-exportjob.cpp
 run_importjob_SOURCES = run-importjob.cpp
 run_keyformailboxjob_SOURCES = run-keyformailboxjob.cpp
 run_receivekeysjob_SOURCES = run-receivekeysjob.cpp
 run_refreshkeysjob_SOURCES = run-refreshkeysjob.cpp
 run_signarchivejob_SOURCES = run-signarchivejob.cpp
+run_signjob_SOURCES = run-signjob.cpp
+run_verifyopaquejob_SOURCES = run-verifyopaquejob.cpp
 run_wkdrefreshjob_SOURCES = run-wkdrefreshjob.cpp
 
 nodist_t_keylist_SOURCES = $(moc_files)
@@ -111,9 +115,13 @@ noinst_PROGRAMS = \
 	t-trustsignatures t-changeexpiryjob t-wkdlookup t-import t-revokekey \
 	t-setprimaryuserid \
 	run-decryptverifyarchivejob \
+	run-decryptverifyjob \
 	run-encryptarchivejob \
+	run-encryptjob \
 	run-importjob run-exportjob run-receivekeysjob run-refreshkeysjob \
 	run-signarchivejob \
+	run-signjob \
+	run-verifyopaquejob \
 	run-wkdrefreshjob
 
 

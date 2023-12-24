@@ -1,8 +1,8 @@
 /*
-    signencryptjob_p.h
+    decryptverifyjob_p.h
 
     This file is part of qgpgme, the Qt API binding for gpgme
-    Copyright (c) 2022,2023 g10 Code GmbH
+    Copyright (c) 2023 g10 Code GmbH
     Software engineering by Ingo Klöcker <dev@ingo-kloecker.de>
 
     QGpgME is free software; you can redistribute it and/or
@@ -31,29 +31,20 @@
     your version.
 */
 
-#ifndef __QGPGME_SIGNENCRYPTJOB_P_H__
-#define __QGPGME_SIGNENCRYPTJOB_P_H__
+#ifndef __QGPGME_DECRYPTVERIFYJOB_P_H__
+#define __QGPGME_DECRYPTVERIFYJOB_P_H__
 
 #include "job_p.h"
-
-#include <key.h>
 
 namespace QGpgME
 {
 
-struct SignEncryptJobPrivate : public JobPrivate
+struct DecryptVerifyJobPrivate : public JobPrivate
 {
-    // used by start() functions
-    QString m_fileName;
-
-    // used by startIt()
-    std::vector<GpgME::Key> m_signers;
-    std::vector<GpgME::Key> m_recipients;
     QString m_inputFilePath;
     QString m_outputFilePath;
-    GpgME::Context::EncryptionFlags m_encryptionFlags = GpgME::Context::EncryptFile;
 };
 
 }
 
-#endif // __QGPGME_SIGNENCRYPTJOB_P_H__
+#endif // __QGPGME_DECRYPTVERIFYJOB_P_H__

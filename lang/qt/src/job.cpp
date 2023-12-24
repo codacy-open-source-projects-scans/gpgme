@@ -43,14 +43,9 @@
 
 #include "keylistjob.h"
 #include "listallkeysjob.h"
-#include "encryptjob.h"
 #include "decryptjob.h"
-#include "decryptverifyjob.h"
-#include "signjob.h"
 #include "signkeyjob.h"
-#include "signencryptjob.h"
 #include "verifydetachedjob.h"
-#include "verifyopaquejob.h"
 #include "keygenerationjob.h"
 #include "importjob.h"
 #include "importfromkeyserverjob.h"
@@ -164,14 +159,9 @@ void QGpgME::Job::startNow()
 
 make_job_subclass(KeyListJob)
 make_job_subclass(ListAllKeysJob)
-make_job_subclass(EncryptJob)
 make_job_subclass(DecryptJob)
-make_job_subclass(DecryptVerifyJob)
-make_job_subclass(SignJob)
-make_job_subclass(SignEncryptJob)
 make_job_subclass(SignKeyJob)
 make_job_subclass(VerifyDetachedJob)
-make_job_subclass(VerifyOpaqueJob)
 make_job_subclass(KeyGenerationJob)
 make_job_subclass(AbstractImportJob)
 make_job_subclass_ext(ImportJob, AbstractImportJob)
@@ -202,14 +192,9 @@ make_job_subclass(SetPrimaryUserIDJob)
 
 #include "keylistjob.moc"
 #include "listallkeysjob.moc"
-#include "encryptjob.moc"
 #include "decryptjob.moc"
-#include "decryptverifyjob.moc"
-#include "signjob.moc"
-#include "signencryptjob.moc"
 #include "signkeyjob.moc"
 #include "verifydetachedjob.moc"
-#include "verifyopaquejob.moc"
 #include "keygenerationjob.moc"
 #include "abstractimportjob.moc"
 #include "importjob.moc"

@@ -1145,7 +1145,7 @@ uiserver_encrypt (void *engine, gpgme_key_t recp[], const char *recpstring,
   else
     return gpgme_error (GPG_ERR_UNSUPPORTED_PROTOCOL);
 
-  if (flags & GPGME_ENCRYPT_ARCHIVE)
+  if (flags & (GPGME_ENCRYPT_ARCHIVE | GPGME_ENCRYPT_FILE))
     return gpg_error (GPG_ERR_NOT_IMPLEMENTED);
 
   if (flags & GPGME_ENCRYPT_PREPARE)
@@ -1237,7 +1237,9 @@ uiserver_sign (void *engine, gpgme_data_t in, gpgme_data_t out,
   else
     return gpgme_error (GPG_ERR_UNSUPPORTED_PROTOCOL);
 
-  if (flags & (GPGME_SIG_MODE_CLEAR | GPGME_SIG_MODE_ARCHIVE))
+  if (flags & (GPGME_SIG_MODE_CLEAR
+               | GPGME_SIG_MODE_ARCHIVE
+               | GPGME_SIG_MODE_FILE))
     return gpg_error (GPG_ERR_INV_VALUE);
 
   if (gpgrt_asprintf (&cmd, "SIGN%s%s", protocol,

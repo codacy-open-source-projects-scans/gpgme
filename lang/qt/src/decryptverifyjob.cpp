@@ -1,8 +1,8 @@
 /*
-    signencryptjob_p.h
+    decryptverifyjob.cpp
 
     This file is part of qgpgme, the Qt API binding for gpgme
-    Copyright (c) 2022,2023 g10 Code GmbH
+    Copyright (c) 2023 g10 Code GmbH
     Software engineering by Ingo Klöcker <dev@ingo-kloecker.de>
 
     QGpgME is free software; you can redistribute it and/or
@@ -31,29 +31,44 @@
     your version.
 */
 
-#ifndef __QGPGME_SIGNENCRYPTJOB_P_H__
-#define __QGPGME_SIGNENCRYPTJOB_P_H__
+#ifdef HAVE_CONFIG_H
+ #include "config.h"
+#endif
 
-#include "job_p.h"
+#include "decryptverifyjob.h"
+#include "decryptverifyjob_p.h"
 
-#include <key.h>
+using namespace QGpgME;
 
-namespace QGpgME
+DecryptVerifyJob::DecryptVerifyJob(QObject *parent)
+    : Job{parent}
 {
-
-struct SignEncryptJobPrivate : public JobPrivate
-{
-    // used by start() functions
-    QString m_fileName;
-
-    // used by startIt()
-    std::vector<GpgME::Key> m_signers;
-    std::vector<GpgME::Key> m_recipients;
-    QString m_inputFilePath;
-    QString m_outputFilePath;
-    GpgME::Context::EncryptionFlags m_encryptionFlags = GpgME::Context::EncryptFile;
-};
-
 }
 
-#endif // __QGPGME_SIGNENCRYPTJOB_P_H__
+DecryptVerifyJob::~DecryptVerifyJob() = default;
+
+void DecryptVerifyJob::setInputFile(const QString &path)
+{
+    auto d = jobPrivate<DecryptVerifyJobPrivate>(this);
+    d->m_inputFilePath = path;
+}
+
+QString DecryptVerifyJob::inputFile() const
+{
+    auto d = jobPrivate<DecryptVerifyJobPrivate>(this);
+    return d->m_inputFilePath;
+}
+
+void DecryptVerifyJob::setOutputFile(const QString &path)
+{
+    auto d = jobPrivate<DecryptVerifyJobPrivate>(this);
+    d->m_outputFilePath = path;
+}
+
+QString DecryptVerifyJob::outputFile() const
+{
+    auto d = jobPrivate<DecryptVerifyJobPrivate>(this);
+    return d->m_outputFilePath;
+}
+
+#include "decryptverifyjob.moc"
