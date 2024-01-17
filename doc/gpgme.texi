@@ -2601,7 +2601,7 @@ addresses is not supported.
 
 The function @code{gpgme_set_sender} specifies the sender address for
 use in sign and verify operations.  @var{address} is expected to be
-the ``addr-spec'' part of an address but my also be a complete mailbox
+the ``addr-spec'' part of an address but may also be a complete mailbox
 address, in which case this function extracts the ``addr-spec'' from
 it.  Using @code{NULL} for @var{address} clears the sender address.
 
@@ -5377,16 +5377,19 @@ operation was started successfully, and @code{GPG_ERR_INV_VALUE} if
 @var{ctx} or @var{key} is not a valid pointer.
 @end deftypefun
 
-The following functions allow only to use one particular flag.
+The following functions allow only to use one particular flag.  Their
+use is thus deprecated.
 
 @deftypefun gpgme_error_t gpgme_op_delete (@w{gpgme_ctx_t @var{ctx}}, @w{const gpgme_key_t @var{key}}, @w{int @var{allow_secret}})
 Similar to @code{gpgme_op_delete_ext}, but only the flag
-@code{GPGME_DELETE_ALLOW_SECRET} can be provided.
+@code{GPGME_DELETE_ALLOW_SECRET} can be provided.  Actually all true
+values are mapped to this flag.
 @end deftypefun
 
 @deftypefun gpgme_error_t gpgme_op_delete_start (@w{gpgme_ctx_t @var{ctx}}, @w{const gpgme_key_t @var{key}}, @w{int @var{allow_secret}})
 Similar to @code{gpgme_op_delete_ext_start}, but only the flag
-@code{GPGME_DELETE_ALLOW_SECRET} can be provided.
+@code{GPGME_DELETE_ALLOW_SECRET} can be provided.  Actually all true
+values are mapped to this flag.
 @end deftypefun
 
 
