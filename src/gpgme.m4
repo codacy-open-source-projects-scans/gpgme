@@ -9,7 +9,7 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
-# Last-changed: 2022-11-25
+# Last-changed: 2024-05-16
 
 
 dnl
@@ -73,12 +73,9 @@ AC_DEFUN([_AM_PATH_GPGRT_CONFIG],[dnl
         fi
         if test -n "$gpgrt_libdir"; then break; fi
       done
-      if test -z "$libdir_candidates"; then
-        # No valid pkgconfig dir in any of the system directories, fallback
-        gpgrt_libdir=${possible_libdir1}
-      fi
-    else
-      # When we cannot determine system libdir-format, use this:
+    fi
+    if test -z "$gpgrt_libdir"; then
+      # No valid pkgconfig dir in any of the system directories, fallback
       gpgrt_libdir=${possible_libdir1}
     fi
   else
@@ -92,6 +89,7 @@ AC_DEFUN([_AM_PATH_GPGRT_CONFIG],[dnl
       AC_MSG_NOTICE([Use gpgrt-config with $gpgrt_libdir as gpg-error-config])
       gpg_error_config_version=`$GPG_ERROR_CONFIG --modversion`
     else
+      gpg_error_config_version=`$GPG_ERROR_CONFIG --version`
       unset GPGRT_CONFIG
     fi
   elif test "$GPG_ERROR_CONFIG" != "no"; then
@@ -186,7 +184,8 @@ dnl config script does not match the host specification the script
 dnl is added to the gpg_config_script_warn variable.
 dnl
 AC_DEFUN([AM_PATH_GPGME],
-[ AC_REQUIRE([_AM_PATH_GPGME_CONFIG])dnl
+[ AC_REQUIRE([AC_CANONICAL_HOST])dnl
+  AC_REQUIRE([_AM_PATH_GPGME_CONFIG])dnl
   tmp=ifelse([$1], ,1:0.4.2,$1)
   if echo "$tmp" | grep ':' >/dev/null 2>/dev/null ; then
      req_gpgme_api=`echo "$tmp"     | sed 's/\(.*\):\(.*\)/\1/'`
