@@ -44,6 +44,7 @@ private_keys = \
 
 
 EXTRA_DIST = initial.test final.test \
+		key-with-revokers.asc \
 		t-chunking.in.json t-chunking.out.json \
 		t-config.in.json t-config-opt.in.json \
 		t-config-opt.out.json t-config.out.json \
@@ -57,6 +58,7 @@ EXTRA_DIST = initial.test final.test \
 		t-export-secret-info.in.json t-export-secret-info.out.json \
 		t-import.in.json t-import.out.json \
 		t-keylist.in.json t-keylist.out.json \
+		t-keylist-revokers.in.json t-keylist-revokers.out.json \
 		t-keylist-secret.in.json t-keylist-secret.out.json \
 		t-sign.in.json t-sign.out.json \
 		t-sig-notations.in.json t-sig-notations.out.json \
@@ -88,9 +90,13 @@ gpg-sample.stamp: $(private_keys)
         done
 	echo x > ./gpg-sample.stamp
 
-pubring-stamp: $(top_srcdir)/tests/gpg/pubdemo.asc gpg-sample.stamp
+pubring-stamp: $(top_srcdir)/tests/gpg/pubdemo.asc \
+	       $(top_srcdir)/tests/json/key-with-revokers.asc \
+	       gpg-sample.stamp
 	$(TESTS_ENVIRONMENT) $(GPG) --batch --no-permission-warning \
                --import $(top_srcdir)/tests/gpg/pubdemo.asc
+	$(TESTS_ENVIRONMENT) $(GPG) --batch --no-permission-warning \
+		--import $(top_srcdir)/tests/json/key-with-revokers.asc
 	-$(TESTS_ENVIRONMENT) $(GPG) --batch --no-permission-warning \
 		--import $(top_srcdir)/tests/gpg/secdemo.asc
 	-$(TESTS_ENVIRONMENT) gpgconf --kill all
