@@ -9,6 +9,8 @@ Noteworthy changes in version 1.24.0 (unrelease)
 
  * Add information about designated revocation keys.  [T7118]
 
+ * New context flag "import-options".  [T7152]
+
  * cpp: Provide information about designated revocation keys for a Key.
    [T7118]
 
@@ -18,12 +20,15 @@ Noteworthy changes in version 1.24.0 (unrelease)
  * qt: Allow writing the decrypted/encrypted/signed/verified data directly
    to files.  [T6550]
 
+ * qt: Allow specifying import options when importing keys.  [T7152]
+
  * Interface changes relative to the 1.23.2 release:
  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  GPGME_ENCRYPT_FILE                      NEW.
  GPGME_SIG_MODE_FILE                     NEW.
  gpgme_key_t                             EXTENDED: New field 'revkeys'.
  gpgme_revocation_key_t                  NEW.
+ gpgme_set_ctx_flag                      EXTENDED: New flag 'import-options'.
  cpp: Context::EncryptFile               NEW.
  cpp: SignatureMode::SignFile            NEW.
  cpp: RevocationKey                      NEW.
@@ -68,6 +73,8 @@ Noteworthy changes in version 1.24.0 (unrelease)
  qt: VerifyOpaqueJob::inputFile          NEW.
  qt: VerifyOpaqueJob::setOutputFile      NEW.
  qt: VerifyOpaqueJob::outputFile         NEW.
+ qt: ImportJob::setImportOptions         NEW.
+ qt: ImportJob::importOptions            NEW.
 
 
 Noteworthy changes in version 1.23.2 (2023-11-28)

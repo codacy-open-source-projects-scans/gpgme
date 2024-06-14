@@ -44,6 +44,7 @@ namespace QGpgME
 struct ImportJobPrivate : public JobPrivate
 {
     QString m_importFilter;
+    QStringList m_importOptions;
     GpgME::Key::Origin m_keyOrigin = GpgME::Key::OriginUnknown;
     QString m_keyOriginUrl;
 };
