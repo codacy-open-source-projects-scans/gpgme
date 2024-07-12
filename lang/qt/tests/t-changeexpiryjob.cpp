@@ -37,9 +37,10 @@
 #include "t-support.h"
 
 #include "changeexpiryjob.h"
-#include "context.h"
-#include "engineinfo.h"
+#include <gpgme++/context.h>
+#include <gpgme++/engineinfo.h>
 #include "protocol.h"
+#include "util.h"
 
 #include <QSignalSpy>
 #include <QTemporaryDir>
@@ -84,7 +85,7 @@ private Q_SLOTS:
                     this, [this] (const GpgME::Error &err2, const QString &, const GpgME::Error &) {
                         Q_EMIT asyncDone();
                         if (err2) {
-                            QFAIL(qPrintable(QString("The ChangeExpiryJob failed with '%1'.").arg(err2.asString())));
+                            QFAIL(qPrintable(QString("The ChangeExpiryJob failed with '%1'.").arg(errorAsString(err2))));
                         }
                     });
 
@@ -147,7 +148,7 @@ private Q_SLOTS:
                     this, [this] (const GpgME::Error &err2, const QString &, const GpgME::Error &) {
                         Q_EMIT asyncDone();
                         if (err2) {
-                            QFAIL(qPrintable(QString("The ChangeExpiryJob failed with '%1'.").arg(err2.asString())));
+                            QFAIL(qPrintable(QString("The ChangeExpiryJob failed with '%1'.").arg(errorAsString(err2))));
                         }
                     });
 
@@ -211,7 +212,7 @@ private Q_SLOTS:
                     this, [this] (const GpgME::Error &err2, const QString &, const GpgME::Error &) {
                         Q_EMIT asyncDone();
                         if (err2) {
-                            QFAIL(qPrintable(QString("The ChangeExpiryJob failed with '%1'.").arg(err2.asString())));
+                            QFAIL(qPrintable(QString("The ChangeExpiryJob failed with '%1'.").arg(errorAsString(err2))));
                         }
                     });
 
@@ -274,7 +275,7 @@ private Q_SLOTS:
                     this, [this] (const GpgME::Error &err2, const QString &, const GpgME::Error &) {
                         Q_EMIT asyncDone();
                         if (err2) {
-                            QFAIL(qPrintable(QString("The ChangeExpiryJob failed with '%1'.").arg(err2.asString())));
+                            QFAIL(qPrintable(QString("The ChangeExpiryJob failed with '%1'.").arg(errorAsString(err2))));
                         }
                     });
 
@@ -342,7 +343,7 @@ private Q_SLOTS:
                     this, [this] (const GpgME::Error &err2, const QString &, const GpgME::Error &) {
                         Q_EMIT asyncDone();
                         if (err2) {
-                            QFAIL(qPrintable(QString("The ChangeExpiryJob failed with '%1'.").arg(err2.asString())));
+                            QFAIL(qPrintable(QString("The ChangeExpiryJob failed with '%1'.").arg(errorAsString(err2))));
                         }
                     });
 

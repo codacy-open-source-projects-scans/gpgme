@@ -130,6 +130,13 @@ const char *Error::asString() const
     return mMessage.c_str();
 }
 
+std::string Error::asStdString() const
+{
+    std::string message;
+    format_error(static_cast<gpgme_error_t>(mErr), message);
+    return message;
+}
+
 int Error::code() const
 {
     return gpgme_err_code(mErr);
@@ -188,7 +195,7 @@ Error Error::fromCode(unsigned int err, unsigned int src)
 
 std::ostream &operator<<(std::ostream &os, const Error &err)
 {
-    return os << "GpgME::Error(" << err.encodedError() << " (" << err.asString() << "))";
+    return os << "GpgME::Error(" << err.encodedError() << " (" << err.asStdString() << "))";
 }
 
 Context::KeyListModeSaver::KeyListModeSaver(Context *ctx)

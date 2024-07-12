@@ -45,8 +45,8 @@
 #include <QDir>
 #include <QList>
 
-#include "global.h"
-#include "error.h"
+#include <gpgme++/global.h>
+#include <gpgme++/error.h>
 #include "debug.h"
 
 #include <sstream>
@@ -211,7 +211,7 @@ void QGpgMENewCryptoConfigComponent::sync(bool runtime)
     if (const Error err = m_component.save()) {
         qCWarning(QGPGME_LOG) << ":"
             << "Error from gpgconf while saving configuration: %1"
-            << QString::fromLocal8Bit(err.asString());
+            << err;
     }
 }
 

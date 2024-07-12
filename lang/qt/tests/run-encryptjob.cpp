@@ -34,6 +34,7 @@
  #include "config.h"
 #endif
 
+#include <debug.h>
 #include <protocol.h>
 #include <encryptjob.h>
 #include <signencryptjob.h>
@@ -44,9 +45,9 @@
 #include <QFile>
 #include <QTimer>
 
-#include <context.h>
-#include <encryptionresult.h>
-#include <signingresult.h>
+#include <gpgme++/context.h>
+#include <gpgme++/encryptionresult.h>
+#include <gpgme++/signingresult.h>
 
 #include <iostream>
 
@@ -157,7 +158,7 @@ int main(int argc, char **argv)
             err = job->startIt();
         }
         if (err) {
-            std::cerr << "Error: Starting the job failed: " << err.asString() << std::endl;
+            std::cerr << "Error: Starting the job failed: " << err << std::endl;
             return 1;
         }
     } else {
@@ -189,7 +190,7 @@ int main(int argc, char **argv)
             err = job->startIt();
         }
         if (err) {
-            std::cerr << "Error: Starting the job failed: " << err.asString() << std::endl;
+            std::cerr << "Error: Starting the job failed: " << err << std::endl;
             return 1;
         }
     }

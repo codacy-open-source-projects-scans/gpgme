@@ -39,11 +39,12 @@
 #include <QTest>
 #include <QSignalSpy>
 #include <QTemporaryDir>
+#include "debug.h"
 #include "keylistjob.h"
 #include "protocol.h"
 #include "signkeyjob.h"
-#include "context.h"
-#include "engineinfo.h"
+#include <gpgme++/context.h>
+#include <gpgme++/engineinfo.h>
 
 #include "t-support.h"
 
@@ -90,7 +91,7 @@ public:
                                                         const GpgME::Error) {
             Q_EMIT asyncDone();
             if (err2) {
-                qDebug() << "Error: " << err2.asString();
+                qDebug() << "Error: " << err2;
             }
             QVERIFY(err2);
         });

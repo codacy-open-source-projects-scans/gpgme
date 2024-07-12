@@ -38,21 +38,23 @@
 #include <QTemporaryDir>
 #include <QSignalSpy>
 
+#include "debug.h"
 #include "protocol.h"
-#include "tofuinfo.h"
+#include <gpgme++/tofuinfo.h>
 #include "tofupolicyjob.h"
 #include "verifyopaquejob.h"
-#include "verificationresult.h"
-#include "signingresult.h"
+#include <gpgme++/verificationresult.h>
+#include <gpgme++/signingresult.h>
 #include "importjob.h"
-#include "importresult.h"
+#include <gpgme++/importresult.h>
 #include "keylistjob.h"
-#include "keylistresult.h"
+#include <gpgme++/keylistresult.h>
 #include "signjob.h"
-#include "key.h"
+#include <gpgme++/key.h>
+
 #include "t-support.h"
-#include "engineinfo.h"
-#include "context.h"
+#include <gpgme++/engineinfo.h>
+#include <gpgme++/context.h>
 #include <iostream>
 
 using namespace QGpgME;
@@ -376,7 +378,7 @@ private Q_SLOTS:
 
         if (keys.empty()) {
             qDebug() << "bravo@example.net not found";
-            qDebug() << "Error: " << result.error().asString();
+            qDebug() << "Error: " << result.error();
             const auto homedir = QString::fromLocal8Bit(qgetenv("GNUPGHOME"));
             qDebug() << "Homedir is: " << homedir;
             QFileInfo fi(homedir + "/pubring.gpg");

@@ -60,7 +60,6 @@
 #include <shlobj.h>
 
 #include "util.h"
-#include "ath.h"
 #include "sema.h"
 #include "debug.h"
 #include "sys-util.h"
@@ -298,7 +297,7 @@ void
 _gpgme_w32_cancel_synchronous_io (HANDLE thread)
 {
   static int initialized;
-  static BOOL (WINAPI * func)(DWORD);
+  static BOOL (WINAPI * func)(HANDLE);
   void *handle;
 
   if (!initialized)
@@ -319,7 +318,7 @@ _gpgme_w32_cancel_synchronous_io (HANDLE thread)
 
   if (func)
     {
-      if (!func ((DWORD)thread) && GetLastError() != ERROR_NOT_FOUND)
+      if (!func (thread) && GetLastError() != ERROR_NOT_FOUND)
         {
           TRACE (DEBUG_ENGINE, "gpgme:CancelSynchronousIo", NULL,
                  "called for thread %p: ec=%u",
@@ -858,7 +857,7 @@ my_mkstemp (char *tmpl)
     random_time_bits = (((uint64_t)ft.dwHighDateTime << 32)
                         | (uint64_t)ft.dwLowDateTime);
   }
-  value += random_time_bits ^ ath_self ();
+  value += random_time_bits ^ ((uintptr_t)GetCurrentThreadId ());
 
   for (count = 0; count < attempts; value += 7777, ++count)
     {

@@ -39,13 +39,14 @@
 #include "qgpgmedecryptverifyjob.h"
 
 #include "dataprovider.h"
+#include "debug.h"
 #include "decryptverifyjob_p.h"
 #include "util.h"
 
-#include <context.h>
-#include <decryptionresult.h>
-#include <verificationresult.h>
-#include <data.h>
+#include <gpgme++/context.h>
+#include <gpgme++/decryptionresult.h>
+#include <gpgme++/verificationresult.h>
+#include <gpgme++/data.h>
 
 #include <QDebug>
 #include "qgpgme_debug.h"
@@ -118,7 +119,7 @@ static QGpgMEDecryptVerifyJob::result_type decrypt_verify(Context *ctx, QThread 
         const std::pair<DecryptionResult, VerificationResult> res = ctx->decryptAndVerify(indata, outdata);
         Error ae;
         const QString log = _detail::audit_log_as_html(ctx, ae);
-        qCDebug(QGPGME_LOG) << __func__ << "- End no plainText. Error:" << ae.asString();
+        qCDebug(QGPGME_LOG) << __func__ << "- End no plainText. Error:" << ae;
         return std::make_tuple(res.first, res.second, out.data(), log, ae);
     } else {
         QGpgME::QIODeviceDataProvider out(plainText);
@@ -127,7 +128,7 @@ static QGpgMEDecryptVerifyJob::result_type decrypt_verify(Context *ctx, QThread 
         const std::pair<DecryptionResult, VerificationResult> res = ctx->decryptAndVerify(indata, outdata);
         Error ae;
         const QString log = _detail::audit_log_as_html(ctx, ae);
-        qCDebug(QGPGME_LOG) << __func__ << "- End plainText. Error:" << ae.asString();
+        qCDebug(QGPGME_LOG) << __func__ << "- End plainText. Error:" << ae;
         return std::make_tuple(res.first, res.second, QByteArray(), log, ae);
     }
 }
