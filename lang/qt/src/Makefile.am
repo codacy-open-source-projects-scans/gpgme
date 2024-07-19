@@ -20,11 +20,12 @@
 # 02111-1307, USA
 
 if WANT_QT5
-lib_LTLIBRARIES = libqgpgme.la
+libqgpgme_la = libqgpgme.la
 endif
 if WANT_QT6
-lib_LTLIBRARIES = libqgpgmeqt6.la
+libqgpgmeqt6_la = libqgpgmeqt6.la
 endif
+lib_LTLIBRARIES = $(libqgpgme_la) $(libqgpgmeqt6_la)
 
 EXTRA_DIST = QGpgmeConfig.cmake.in.in QGpgmeConfigVersion.cmake.in \
              qgpgme_debug.h qgpgme_version.h.in \
@@ -320,24 +321,67 @@ qgpgme_moc_sources = \
     qgpgmegpgcardjob.moc
 
 if WANT_QT5
-includeprefix = qgpgme-qt5
+includeprefix5 = qgpgme-qt5
+qgpgme5includedir = $(includedir)/$(includeprefix5)/qgpgme
+qgpgme5include_HEADERS = $(qgpgme_headers)
+nodist_qgpgme5include_HEADERS = qgpgme_version.h
+camelcase5includedir = $(includedir)/$(includeprefix5)/QGpgME
+nodist_camelcase5include_HEADERS = $(camelcase_headers)
 endif
 if WANT_QT6
-includeprefix = qgpgme-qt6
+includeprefix6 = qgpgme-qt6
+qgpgme6includedir = $(includedir)/$(includeprefix6)/qgpgme
+qgpgme6include_HEADERS = $(qgpgme_headers)
+nodist_qgpgme6include_HEADERS = qgpgme_version.h
+camelcase6includedir = $(includedir)/$(includeprefix6)/QGpgME
+nodist_camelcase6include_HEADERS = $(camelcase_headers)
 endif
-qgpgmeincludedir = $(includedir)/$(includeprefix)/qgpgme
-qgpgmeinclude_HEADERS = $(qgpgme_headers)
-camelcaseincludedir = $(includedir)/$(includeprefix)/QGpgME
-camelcaseinclude_HEADERS = $(camelcase_headers)
-nodist_qgpgmeinclude_HEADERS = qgpgme_version.h
+
+# generate the moc files in two steps:
+# 1. generate Qt 5/6-specific moc files in builddir with extension .moc5/.moc6;
+#    this ensures correct dependencies on the source files
+# 2. generate forwarding headers in subfolders moc5/moc6 with extension .moc;
+#    this ensures that the "foo.moc" includes in the source files work and
+#    include the correct version of the generated moc files for Qt 5/6
+# GNU make's pattern rules would make this easier, but we don't want to use them
+if WANT_QT5
+moc5_dir = moc5
+qgpgme_moc5_sources = $(qgpgme_moc_sources:%.moc=%.moc5)
+qgpgme_moc5_forward_headers = $(qgpgme_moc_sources:%=$(moc5_dir)/%)
+
+.h.moc5:
+	$(MOC5) `test -f '$<' || echo '$(srcdir)/'`$< -o $@
+
+$(moc5_dir):
+	mkdir $(moc5_dir)
+
+$(qgpgme_moc5_forward_headers): Makefile.am | $(moc5_dir)
+	echo "#include \"../$(notdir $@)5\"" > "$@"
+endif
+if WANT_QT6
+moc6_dir = moc6
+qgpgme_moc6_sources = $(qgpgme_moc_sources:%.moc=%.moc6)
+qgpgme_moc6_forward_headers = $(qgpgme_moc_sources:%=$(moc6_dir)/%)
+
+.h.moc6:
+	$(MOC6) `test -f '$<' || echo '$(srcdir)/'`$< -o $@
+
+$(moc6_dir):
+	mkdir $(moc6_dir)
+
+$(qgpgme_moc6_forward_headers): Makefile.am | $(moc6_dir)
+	echo "#include \"../$(notdir $@)6\"" > "$@"
+endif
 
 if WANT_QT5
-AM_CPPFLAGS = -I$(top_builddir)/lang/cpp/src -I$(top_builddir)/src \
+libqgpgme_la_CPPFLAGS = -I./moc5 -I$(top_builddir)/lang/cpp/src -I$(top_builddir)/src \
               @GPGME_QT5_CFLAGS@ @GPG_ERROR_CFLAGS@ @LIBASSUAN_CFLAGS@ \
               -DBUILDING_QGPGME -Wsuggest-override \
               -Wzero-as-null-pointer-constant
 
 libqgpgme_la_SOURCES = $(qgpgme_sources) $(qgpgme_headers) $(private_qgpgme_headers)
+
+nodist_libqgpgme_la_SOURCES = $(qgpgme_moc5_sources) $(qgpgme_moc5_forward_headers)
 
 libqgpgme_la_LIBADD = ../../cpp/src/libgpgmepp.la ../../../src/libgpgme.la \
                       @LIBASSUAN_LIBS@ @GPG_ERROR_LIBS@ @GPGME_QT5_LIBS@
@@ -345,12 +389,14 @@ libqgpgme_la_LDFLAGS = -no-undefined -version-info \
                        @LIBQGPGME_LT_CURRENT@:@LIBQGPGME_LT_REVISION@:@LIBQGPGME_LT_AGE@
 endif
 if WANT_QT6
-AM_CPPFLAGS = -I$(top_builddir)/lang/cpp/src -I$(top_builddir)/src \
+libqgpgmeqt6_la_CPPFLAGS = -I./moc6 -I$(top_builddir)/lang/cpp/src -I$(top_builddir)/src \
               @GPGME_QT6_CFLAGS@ @GPG_ERROR_CFLAGS@ @LIBASSUAN_CFLAGS@ \
               -DBUILDING_QGPGME -Wsuggest-override \
               -Wzero-as-null-pointer-constant
 
 libqgpgmeqt6_la_SOURCES = $(qgpgme_sources) $(qgpgme_headers) $(private_qgpgme_headers)
+
+nodist_libqgpgmeqt6_la_SOURCES = $(qgpgme_moc6_sources) $(qgpgme_moc6_forward_headers)
 
 libqgpgmeqt6_la_LIBADD = ../../cpp/src/libgpgmepp.la ../../../src/libgpgme.la \
                          @LIBASSUAN_LIBS@ @GPG_ERROR_LIBS@ @GPGME_QT6_LIBS@
@@ -397,50 +443,65 @@ $(camelcase_headers): Makefile.am
 	echo ".h\"" >> "$@"
 
 if WANT_QT5
-install-cmake-files: QGpgmeConfig.cmake QGpgmeConfigVersion.cmake
+install-cmake-files-qt5: QGpgmeConfig.cmake QGpgmeConfigVersion.cmake
 	-$(INSTALL) -d $(DESTDIR)$(libdir)/cmake/QGpgme
 	$(INSTALL) -m 644 QGpgmeConfig.cmake \
 	$(DESTDIR)$(libdir)/cmake/QGpgme/QGpgmeConfig.cmake
 	$(INSTALL) -m 644 QGpgmeConfigVersion.cmake \
 	$(DESTDIR)$(libdir)/cmake/QGpgme/QGpgmeConfigVersion.cmake
+install_cmake_files_qt5 = install-cmake-files-qt5
 
-uninstall-cmake-files:
+uninstall-cmake-files-qt5:
 	-rm $(DESTDIR)$(libdir)/cmake/QGpgme/QGpgmeConfigVersion.cmake
 	-rm $(DESTDIR)$(libdir)/cmake/QGpgme/QGpgmeConfig.cmake
 	-rmdir $(DESTDIR)$(libdir)/cmake/QGpgme/
+uninstall_cmake_files_qt5 = uninstall-cmake-files-qt5
+
+uninstall-include-dirs-qt5:
+	-rmdir $(DESTDIR)$(qgpgme5includedir)
+	-rmdir $(DESTDIR)$(camelcase5includedir)
+	-rmdir $(DESTDIR)$(includedir)/$(includeprefix5)
+uninstall_include_dirs_qt5 = uninstall-include-dirs-qt5
 endif
 if WANT_QT6
-install-cmake-files: QGpgmeQt6Config.cmake QGpgmeQt6ConfigVersion.cmake
+install-cmake-files-qt6: QGpgmeQt6Config.cmake QGpgmeQt6ConfigVersion.cmake
 	-$(INSTALL) -d $(DESTDIR)$(libdir)/cmake/QGpgmeQt6
 	$(INSTALL) -m 644 QGpgmeQt6Config.cmake \
 	$(DESTDIR)$(libdir)/cmake/QGpgmeQt6/QGpgmeQt6Config.cmake
 	$(INSTALL) -m 644 QGpgmeQt6ConfigVersion.cmake \
 	$(DESTDIR)$(libdir)/cmake/QGpgmeQt6/QGpgmeQt6ConfigVersion.cmake
+install_cmake_files_qt6 = install-cmake-files-qt6
 
-uninstall-cmake-files:
+uninstall-cmake-files-qt6:
 	-rm $(DESTDIR)$(libdir)/cmake/QGpgmeQt6/QGpgmeQt6ConfigVersion.cmake
 	-rm $(DESTDIR)$(libdir)/cmake/QGpgmeQt6/QGpgmeQt6Config.cmake
 	-rmdir $(DESTDIR)$(libdir)/cmake/QGpgmeQt6/
+uninstall_cmake_files_qt6 = uninstall-cmake-files-qt6
+
+uninstall-include-dirs-qt6:
+	-rmdir $(DESTDIR)$(qgpgme6includedir)
+	-rmdir $(DESTDIR)$(camelcase6includedir)
+	-rmdir $(DESTDIR)$(includedir)/$(includeprefix6)
+uninstall_include_dirs_qt6 = uninstall-include-dirs-qt6
 endif
 
-install-data-local: install-cmake-files
+install-data-local: $(install_cmake_files_qt5) $(install_cmake_files_qt6)
 
-uninstall-local: uninstall-cmake-files
+uninstall-hook: $(uninstall_cmake_files_qt5) $(uninstall_cmake_files_qt6) \
+		$(uninstall_include_dirs_qt5) $(uninstall_include_dirs_qt6)
 
-BUILT_SOURCES = $(qgpgme_moc_sources) $(camelcase_headers)
+BUILT_SOURCES = $(qgpgme_moc5_sources) $(qgpgme_moc5_forward_headers) \
+		$(qgpgme_moc6_sources) $(qgpgme_moc6_forward_headers) \
+		$(camelcase_headers)
 
-CLEANFILES = $(qgpgme_moc_sources) $(camelcase_headers) QGpgmeConfig.cmake \
+CLEANFILES = $(qgpgme_moc5_sources) $(qgpgme_moc5_forward_headers) \
+	     $(qgpgme_moc6_sources) $(qgpgme_moc6_forward_headers) \
+	     $(camelcase_headers) QGpgmeConfig.cmake \
              qgpgme_version.h QGpgmeConfig.cmake.in \
              QGpgmeConfig-w32.cmake.in QGpgmeConfigVersion.cmake \
              QGpgmeQt6Config.cmake.in QGpgmeQt6Config-w32.cmake.in \
              QGpgmeQt6Config.cmake QGpgmeQt6ConfigVersion.cmake
 
-if WANT_QT5
-nodist_libqgpgme_la_SOURCES = $(qgpgme_moc_sources)
-endif
-if WANT_QT6
-nodist_libqgpgmeqt6_la_SOURCES = $(qgpgme_moc_sources)
-endif
-
-.h.moc:
-	$(MOC) `test -f '$<' || echo '$(srcdir)/'`$< -o $@
+clean-local:
+	-test -z "$(moc5_dir)" || rm -rf $(moc5_dir)
+	-test -z "$(moc6_dir)" || rm -rf $(moc6_dir)
