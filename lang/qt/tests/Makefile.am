@@ -33,6 +33,7 @@ the_tests5 = \
 	t-changeexpiryjob5 \
 	t-config5 \
 	t-decryptverify5 \
+	t-disablekey5 \
 	t-encrypt5 \
 	t-import5 \
 	t-keylist5 \
@@ -69,6 +70,7 @@ the_tests6 = \
 	t-changeexpiryjob6 \
 	t-config6 \
 	t-decryptverify6 \
+	t-disablekey6 \
 	t-encrypt6 \
 	t-import6 \
 	t-keylist6 \
@@ -188,6 +190,9 @@ t_config5_CPPFLAGS = $(cppflags_qt5)
 t_decryptverify5_SOURCES = t-decryptverify.cpp $(support_src)
 t_decryptverify5_LDADD = $(ldadd_qt5)
 t_decryptverify5_CPPFLAGS = $(cppflags_qt5)
+t_disablekey5_SOURCES = t-disablekey.cpp $(support_src)
+t_disablekey5_LDADD = $(ldadd_qt5)
+t_disablekey5_CPPFLAGS = $(cppflags_qt5)
 t_encrypt5_SOURCES = t-encrypt.cpp $(support_src)
 t_encrypt5_LDADD = $(ldadd_qt5)
 t_encrypt5_CPPFLAGS = $(cppflags_qt5)
@@ -288,6 +293,9 @@ t_config6_CPPFLAGS = $(cppflags_qt6)
 t_decryptverify6_SOURCES = t-decryptverify.cpp $(support_src)
 t_decryptverify6_LDADD = $(ldadd_qt6)
 t_decryptverify6_CPPFLAGS = $(cppflags_qt6)
+t_disablekey6_SOURCES = t-disablekey.cpp $(support_src)
+t_disablekey6_LDADD = $(ldadd_qt6)
+t_disablekey6_CPPFLAGS = $(cppflags_qt6)
 t_encrypt6_SOURCES = t-encrypt.cpp $(support_src)
 t_encrypt6_LDADD = $(ldadd_qt6)
 t_encrypt6_CPPFLAGS = $(cppflags_qt6)
@@ -394,6 +402,11 @@ clean-local:
 	-test -z "$(moc6_dir)" || rm -rf $(moc6_dir)
 	-$(TESTS_ENVIRONMENT) $(top_srcdir)/tests/start-stop-agent --stop
 	-rm -fR  private-keys-v1.d crls.d
+
+clean-keyring:
+	-$(TESTS_ENVIRONMENT) $(top_srcdir)/tests/start-stop-agent --stop
+	-rm -fR private-keys-v1.d crls.d pubring.gpg pubring.kbx secring.gpg \
+		trustdb.gpg pubring-stamp
 
 pubring-stamp: $(top_srcdir)/tests/gpg/pubdemo.asc \
 	             $(top_srcdir)/tests/gpg/secdemo.asc
