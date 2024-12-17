@@ -87,7 +87,7 @@ class GPGMEPP_EXPORT Signature
     friend class ::GpgME::VerificationResult;
     Signature(const std::shared_ptr<VerificationResult::Private> &parent, unsigned int index);
 public:
-    typedef GPGMEPP_DEPRECATED GpgME::Notation Notation;
+    GPGMEPP_DEPRECATED typedef GpgME::Notation Notation;
 
     Signature();
 
@@ -139,6 +139,7 @@ public:
     bool isWrongKeyUsage() const;
     bool isVerifiedUsingChainModel() const;
     bool isDeVs() const;
+    bool isBetaCompliance() const;
 
     enum PKAStatus {
         UnknownPKAStatus, PKAVerificationFailed, PKAVerificationSucceeded

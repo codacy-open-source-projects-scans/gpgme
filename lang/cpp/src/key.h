@@ -29,12 +29,12 @@
 
 #include "gpgmefw.h"
 
-#include <memory>
-#include <sys/time.h>
-
-#include <vector>
 #include <algorithm>
+#include <memory>
 #include <string>
+#include <vector>
+
+#include <ctime>
 
 namespace GpgME
 {
@@ -129,6 +129,7 @@ public:
     bool canAuthenticate() const;
     bool isQualified() const;
     bool isDeVs() const;
+    bool isBetaCompliance() const;
 
     /** Returns true, if the key has a certification subkey. */
     bool hasCertify() const;
@@ -289,6 +290,7 @@ public:
     bool isGroupOwned() const;
     bool isQualified() const;
     bool isDeVs() const;
+    bool isBetaCompliance() const;
     bool isCardKey() const;
 
     bool isSecret() const;
@@ -299,6 +301,7 @@ public:
         AlgoRSA     = 1,
         AlgoRSA_E   = 2,
         AlgoRSA_S   = 3,
+        AlgoKyber   = 8,
         AlgoELG_E   = 16,
         AlgoDSA     = 17,
         AlgoECC     = 18,
@@ -473,7 +476,7 @@ private:
 class GPGMEPP_EXPORT UserID::Signature
 {
 public:
-    typedef GPGMEPP_DEPRECATED GpgME::Notation Notation;
+    GPGMEPP_DEPRECATED typedef GpgME::Notation Notation;
 
     Signature();
     Signature(const shared_gpgme_key_t &key, gpgme_user_id_t uid, gpgme_key_sig_t sig);

@@ -32,7 +32,7 @@ min_automake_version="1.14"
 m4_define([mym4_package],[gpgme])
 m4_define([mym4_major], [1])
 m4_define([mym4_minor], [24])
-m4_define([mym4_micro], [0])
+m4_define([mym4_micro], [2])
 
 # Below is m4 magic to extract and compute the git revision number,
 # the decimalized short revision number, a beta version string and a
@@ -44,7 +44,9 @@ m4_define([mym4_isbeta],       m4_argn(2, mym4_verslist))
 m4_define([mym4_version],      m4_argn(4, mym4_verslist))
 m4_define([mym4_revision],     m4_argn(7, mym4_verslist))
 m4_define([mym4_revision_dec], m4_argn(8, mym4_verslist))
+m4_define([mym4_commitid],     m4_argn(9, mym4_verslist))
 m4_esyscmd([echo ]mym4_version[>VERSION])
+m4_esyscmd([echo ]mym4_commitid[>>VERSION])
 AC_INIT([mym4_package],[mym4_version],[https://bugs.gnupg.org])
 
 # LT Version numbers, remember to change them just *before* a release.
@@ -53,19 +55,19 @@ AC_INIT([mym4_package],[mym4_version],[https://bugs.gnupg.org])
 #   (Interfaces added:			AGE++)
 #   (Interfaces removed:		AGE=0)
 #
-LIBGPGME_LT_CURRENT=43
-LIBGPGME_LT_AGE=32
+LIBGPGME_LT_CURRENT=44
+LIBGPGME_LT_AGE=33
 LIBGPGME_LT_REVISION=1
 
 # If there is an ABI break in gpgmepp or qgpgme also bump the
 # version in IMPORTED_LOCATION in the GpgmeppConfig-w32.cmake.in.in
 
-LIBGPGMEPP_LT_CURRENT=26
-LIBGPGMEPP_LT_AGE=20
+LIBGPGMEPP_LT_CURRENT=27
+LIBGPGMEPP_LT_AGE=21
 LIBGPGMEPP_LT_REVISION=1
 
-LIBQGPGME_LT_CURRENT=20
-LIBQGPGME_LT_AGE=5
+LIBQGPGME_LT_CURRENT=21
+LIBQGPGME_LT_AGE=6
 LIBQGPGME_LT_REVISION=1
 ################################################
 
@@ -612,7 +614,7 @@ if test "$found_py" = "1"; then
 	if test "$found_py" = "1" -o "$found_py3" = "1"; then
 	  # Reset everything, so that we can look for another Python.
           m4_foreach([mym4pythonver],
-                     [[2.7],[3.6],[3.8],[3.9],[3.10],[3.11],[3.12],[all]],
+                     [[2.7],[3.6],[3.9],[3.10],[3.11],[3.12],[3.13],[all]],
            [unset PYTHON
 	    unset PYTHON_VERSION
 	    unset PYTHON_CPPFLAGS
@@ -669,9 +671,12 @@ AC_SUBST(ENABLED_LANGUAGES, $enabled_languages)
 # Provide information about the build.
 #
 BUILD_REVISION="mym4_revision"
+BUILD_COMMITID="mym4_commitid"
 AC_SUBST(BUILD_REVISION)
 AC_DEFINE_UNQUOTED(BUILD_REVISION, "$BUILD_REVISION",
-                   [GIT commit id revision used to build this package])
+                   [GIT short commit id used to build this package])
+AC_DEFINE_UNQUOTED(BUILD_COMMITID, "$BUILD_COMMITID",
+                   [Git commit id used to build this package])
 
 changequote(,)dnl
 BUILD_VERSION=`echo "$PACKAGE_VERSION" | sed 's/\([0-9.]*\).*/\1./'`
@@ -913,6 +918,25 @@ fi
 
 # Check for getgid etc
 AC_CHECK_FUNCS(getgid getegid closefrom nanosleep)
+
+# Check for gettid - test taken from strongswan git
+AC_CHECK_FUNC(gettid,
+       [AC_DEFINE(HAVE_GETTID, 1, [Defined if gettid is available.])],
+       [AC_MSG_CHECKING([for SYS_gettid])
+        AC_COMPILE_IFELSE(
+               [AC_LANG_PROGRAM(
+                       [[#define _GNU_SOURCE
+                         #include <unistd.h>
+                         #include <sys/syscall.h>
+                       ]],
+                       [[int main() {
+                         return syscall(SYS_gettid);}]])],
+               [AC_MSG_RESULT([yes])
+                AC_DEFINE(HAVE_SYS_GETTID,1,
+                         [Defined is the system call gettid is available])],
+               [AC_MSG_RESULT([no])]
+       )]
+)
 
 
 # Replacement functions.
