@@ -48,7 +48,7 @@ else
 tests =
 endif
 
-SUBDIRS = src ${tests} doc lang
+SUBDIRS = src ${tests} doc lang tools
 
 # Fix the version of the spec file.
 dist-hook: gen-ChangeLog
@@ -74,7 +74,7 @@ distcheck-hook:
 
 gen_start_date = 2011-12-01T00:00:00
 gen-ChangeLog:
-	if test -d $(top_srcdir)/.git; then				\
+	if test -e $(top_srcdir)/.git; then				\
 	  (cd $(top_srcdir) &&                      			\
 	    $(GITLOG_TO_CHANGELOG) --append-dot --tear-off		\
 	    --amend=build-aux/git-log-fix				\

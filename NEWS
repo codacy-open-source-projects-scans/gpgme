@@ -1,5 +1,93 @@
-Noteworthy changes in version 1.24.2 (unreleased)
--------------------------------------------------
+Noteworthy changes in version 2.0.2 (unreleased)   [C45/A0/R)]
+------------------------------------------------
+
+
+Noteworthy changes in version 2.0.1 (2025-09-23)   [C45/A0/R1]
+------------------------------------------------
+
+ * gnupg-key-manage: New tool as a framework for adding features
+   which would normally be implemented by a script.  Right now it
+   supports the commands "identify" and "delete-expired-keys".
+
+ * Extend the internal gpgsm_assuan_simple_command to consume diag
+   output.  This fixes a possible lockup.  [T7759]
+
+ * Clean up get_max_fds implementation.  [T7694]
+
+ * Adjust for changes to the posix test(1) command.  [T7807]
+
+ * Make it easier to maintain gpgme.h by using forward declarations.
+   [rM6a1f72b470]
+
+ Release-info: https://dev.gnupg.org/T7817
+
+
+Noteworthy changes in version 2.0.0 (2025-06-03)   [C45/A0/R0]
+------------------------------------------------
+
+ * The C++ bindings, the Qt bindings, and the Python bindings were
+   split off of gpgme. They are now released separately.  [T7262]
+
+ * New function gpgme_op_random_bytes to get cryptographically
+   strong random bytes from gpg.  [T6694]
+
+ * New function gpgme_op_random_value to get a cryptographically
+   strong unsigned integer random value.   [T6694]
+
+ * New decrypt flag to skip the actual decryption so that information
+   about the recipients can be retrieved.
+
+ * New flag for key generate to mark a (sub)key as group owned.
+
+ * If the key passed to gpgme_signers_add was retrieved with an exact
+   pattern (fingerprint with '!' suffix), the requested subkey is used
+   for signing.  This reflects the behaviour of gpg but is a minor
+   semantic change.  [T3325]
+
+ * The timestamp and expires fields in gpgme_subkey_t, gpgme_key_sig,
+   and gpgme_new_signature_t are changed from signed long to unsigned
+   long to better cope with 32bit time_t implementations.  These
+   fields should in reality never see an error value (-1).
+
+ * Removed the gpgme_attr_t enums and their functions which were
+   deprecated since 2003.  [rMd54d6eaa64]
+
+ * Removed the never implemented or announced GPGME_EXPORT_MODE_NOUID
+   flags.  [rMd54d6eaa64]
+
+ * Removed the entire trustlist feature which worked anyway only for a
+   short period in 2003.  [T4834]
+
+ * Interface changes relative to the 1.24 branch:
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ gpgme_op_random_bytes                   NEW.
+ gpgme_op_random_value                   NEW.
+ GPGME_RANDOM_MODE_NORMAL                NEW.
+ GPGME_RANDOM_MODE_ZBASE32               NEW.
+ GPGME_DECRYPT_LISTONLY                  NEW.
+ gpgme_subkey_t                          EXT: New field 'subkey_match'.
+ GPGME_CREATE_GROUP                      NEW.
+ gpgme_attr_t                            REMOVED.
+ gpgme_get_sig_ulong_attr                REMOVED.
+ gpgme_get_sig_string_attr               REMOVED.
+ gpgme_key_get_string_attr               REMOVED.
+ gpgme_key_get_ulong_attr                REMOVED.
+ gpgme_key_sig_get_string_attr           REMOVED.
+ gpgme_key_sig_get_ulong_attr            REMOVED.
+ gpgme_trust_item_get_string_attr        REMOVED.
+ gpgme_trust_item_get_int_attr           REMOVED.
+ GPGME_EXPORT_MODE_NOUID                 REMOVED.
+ GPGME_EVENT_NEXT_TRUSTITEM              REMOVED.
+ gpgme_trust_item_t                      REMOVED.
+ GpgmeTrustItem                          REMOVED.
+ gpgme_op_trustlist_start                REMOVED.
+ gpgme_op_trustlist_next                 REMOVED.
+ gpgme_op_trustlist_end                  REMOVED.
+ gpgme_trust_item_ref                    REMOVED.
+ gpgme_trust_item_unref                  REMOVED.
+ gpgme_trust_item_release                REMOVED.
+
+ Release-info: https://dev.gnupg.org/T7673
 
 
 Noteworthy changes in version 1.24.1 (2024-12-04)
@@ -16,6 +104,9 @@ Noteworthy changes in version 1.24.1 (2024-12-04)
  [c=C44/A33/R1 cpp=C27/A21/R1 qt=C21/A6/R1]
 
  Release-info: https://dev.gnupg.org/T7440
+
+ Note that bug fix releases for the 1.24 branch may exist.  The first
+ bug fix release will be 1.24.2.
 
 
 Noteworthy changes in version 1.24.0 (2024-11-06)

@@ -77,9 +77,6 @@ EXPORTS
     gpgme_key_unref                       @51
     gpgme_key_release                     @52
 
-    gpgme_trust_item_ref                  @53
-    gpgme_trust_item_unref                @54
-
     gpgme_cancel                          @55
     gpgme_op_card_edit                    @56
     gpgme_op_card_edit_start              @57
@@ -116,9 +113,7 @@ EXPORTS
     gpgme_op_sign                         @88
     gpgme_op_sign_result                  @89
     gpgme_op_sign_start                   @90
-    gpgme_op_trustlist_end                @91
-    gpgme_op_trustlist_next               @92
-    gpgme_op_trustlist_start              @93
+
     gpgme_op_verify                       @94
     gpgme_op_verify_result                @95
     gpgme_op_verify_start                 @96
@@ -127,17 +122,8 @@ EXPORTS
     gpgme_data_new_with_read_cb           @98
     gpgme_data_rewind                     @99
     gpgme_get_sig_status                  @100
-    gpgme_get_sig_string_attr             @101
-    gpgme_get_sig_ulong_attr              @102
     gpgme_get_sig_key                     @103
-    gpgme_key_get_string_attr             @104
-    gpgme_key_get_ulong_attr              @105
-    gpgme_key_sig_get_string_attr         @106
-    gpgme_key_sig_get_ulong_attr          @107
     gpgme_op_import_ext                   @108
-    gpgme_trust_item_get_int_attr         @109
-    gpgme_trust_item_get_string_attr      @110
-    gpgme_trust_item_release              @111
 
     gpgme_set_engine_info                 @112
 
@@ -288,5 +274,7 @@ EXPORTS
 
     gpgme_op_setownertrust                @213
     gpgme_op_setownertrust_start          @214
-; END
 
+    gpgme_op_random_bytes                 @215
+    gpgme_op_random_value                 @216
+; END

@@ -134,6 +134,10 @@ _gpgme_is_fd_valid (int fd)
 #endif /*0*/
 
 
+/* Fallback value for max_fds for some systems.  It can be used later
+   in get_max_fds function.  */
+static int max_fds_fallback;
+
 void
 _gpgme_io_subsystem_init (void)
 {
@@ -147,6 +151,23 @@ _gpgme_io_subsystem_init (void)
       act.sa_flags = 0;
       sigaction (SIGPIPE, &act, NULL);
     }
+
+  max_fds_fallback = -1;
+
+#ifdef _SC_OPEN_MAX
+  if (max_fds_fallback == -1)
+    {
+      /* For multithread application, sysconf cannot be used in the
+       * forked child process (in get_max_fds function), since it is
+       * not async-signal-safe function.  Here, we can assume it's
+       * only a single thread.
+       */
+      long scres = sysconf (_SC_OPEN_MAX);
+
+      if (scres >= 0)
+        max_fds_fallback = scres;
+    }
+#endif
 }
 
 
@@ -354,7 +375,7 @@ _gpgme_io_set_nonblocking (int fd)
 }
 
 
-static long int
+static int
 get_max_fds (void)
 {
   const char *source = NULL;
@@ -373,9 +394,11 @@ get_max_fds (void)
 #ifdef USE_LINUX_GETDENTS
   {
     int dir_fd;
-    char dir_buf[DIR_BUF_SIZE];
+    struct linux_dirent64 buf[(DIR_BUF_SIZE+sizeof (struct linux_dirent64)-1)
+                              /sizeof (struct linux_dirent64)];
+    char *dir_buf = (char *)buf; /* BUF aligned for struct linux_dirent64 */
     struct linux_dirent64 *dir_entry;
-    int r, pos;
+    long r, pos;
     const char *s;
     int x;
 
@@ -384,7 +407,7 @@ get_max_fds (void)
       {
         for (;;)
           {
-            r = syscall(SYS_getdents64, dir_fd, dir_buf, DIR_BUF_SIZE);
+            r = syscall(SYS_getdents64, dir_fd, dir_buf, sizeof (buf));
             if (r == -1)
               {
                 /* Fall back to other methods.  */
@@ -442,18 +465,13 @@ get_max_fds (void)
 	}
     }
 #endif
-#ifdef _SC_OPEN_MAX
-  if (fds == -1)
+
+  if (fds == -1 && max_fds_fallback >= 0)
     {
-      long int scres;
-      scres = sysconf (_SC_OPEN_MAX);
-      if (scres >= 0)
-	{
-	  source = "_SC_OPEN_MAX";
-	  return scres;
-	}
+      source = "fallback";
+      return max_fds_fallback;
     }
-#endif
+
 #ifdef OPEN_MAX
   if (fds == -1)
     {
@@ -483,7 +501,11 @@ get_max_fds (void)
     }
 #endif
 
+#if 0 /* This may result hang in multi-thread application.  */
   TRACE (DEBUG_SYSIO, "gpgme:max_fds", NULL, "max fds=%ld (%s)", fds, source);
+#else
+  (void)source;
+#endif
   return fds;
 }
 
@@ -777,9 +799,10 @@ _gpgme_io_select_poll (struct io_select_fd_s *fds, size_t nfds, int nonblock)
           if (fds[i].fd == -1)
             continue;
 	  if ((poll_fds[poll_nfds].revents & (POLLIN|POLLHUP)))
-	    TRACE_ADD1 (dbg_help, "r=%d ", i);
+	    TRACE_ADD2 (dbg_help, "r=%d (%x) ", fds[i].fd,
+                        (int)poll_fds[poll_nfds].revents);
 	  if ((poll_fds[poll_nfds].revents & POLLOUT))
-	    TRACE_ADD1 (dbg_help, "w=%d ", i);
+	    TRACE_ADD1 (dbg_help, "w=%d ", fds[i].fd);
           poll_nfds++;
         }
       TRACE_END (dbg_help, "]");
@@ -831,7 +854,7 @@ _gpgme_io_select_select (struct io_select_fd_s *fds, size_t nfds, int nonblock)
   if (nonblock)
     timeout.tv_sec = 0;
 
-  TRACE_SEQ (dbg_help, "select on [ ");
+  TRACE_SEQ (dbg_help, "selecting [ ");
 
   any = 0;
   for (i = 0; i < nfds; i++)

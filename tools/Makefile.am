@@ -1,5 +1,5 @@
-# Makefile.am for gpgme/lang.
-# Copyright (C) 2003, 2006 g10 Code GmbH
+# Makefile.am - Makefile for GPGME tools.
+# Copyright (C) 2025 g10 Code GmbH
 #
 # This file is part of GPGME.
 #
@@ -17,7 +17,15 @@
 # License along with this program; if not, see <https://gnu.org/licenses/>.
 # SPDX-License-Identifier: LGPL-2.1-or-later
 
-SUBDIRS = $(ENABLED_LANGUAGES)
-DIST_SUBDIRS = cl js
+## Process this file with automake to produce Makefile.in
 
-EXTRA_DIST = README
+GNUPGHOME=$(abs_builddir)
+
+AM_CFLAGS = -I$(top_builddir)/src $(GPG_ERROR_CFLAGS)
+
+LDADD = ../src/libgpgme.la $(GPG_ERROR_LIBS)
+
+bin_PROGRAMS = gnupg-key-manage
+
+
+gnupg_key_manage_SOURCES = gnupg-key-manage.c

@@ -458,6 +458,27 @@ have_option_proc_all_sigs (engine_gpg_t gpg)
 
 
 static int
+have_option_gen_group_key (engine_gpg_t gpg)
+{
+  static unsigned int flag;
+
+  if (flag)
+    ;
+  else if (have_gpg_version (gpg, "2.5.7"))
+    flag = 1|2;
+  else if (have_gpg_version (gpg, "2.4.8") && !have_gpg_version (gpg, "2.5.0"))
+    flag = 1|2;
+  else if (have_gpg_version (gpg, "2.2.48") && !have_gpg_version (gpg, "2.3.0"))
+    flag = 1|2;
+  else
+    flag = 1;
+
+  return !!(flag & 2);
+}
+
+
+
+static int
 have_cmd_modify_recipients (engine_gpg_t gpg)
 {
   static unsigned int flag;
@@ -1952,6 +1973,9 @@ gpg_decrypt (void *engine,
         err = add_arg (gpg, "--unwrap");
     }
 
+  if (!err && (flags & GPGME_DECRYPT_LISTONLY))
+    err = add_arg (gpg, "--list-only");
+
   if (!err && export_session_key)
     err = add_gpg_arg (gpg, "--show-session-key");
 
@@ -2100,17 +2124,39 @@ append_args_from_signers (engine_gpg_t gpg, gpgme_ctx_t ctx /* FIXME */)
   gpgme_error_t err = 0;
   int i;
   gpgme_key_t key;
+  gpgme_subkey_t subkey;
+  const char *s;
 
   for (i = 0; (key = gpgme_signers_enum (ctx, i)); i++)
     {
-      const char *s = key->subkeys ? key->subkeys->keyid : NULL;
-      if (s)
-	{
-	  if (!err)
-	    err = add_arg (gpg, "-u");
-	  if (!err)
-	    err = add_arg (gpg, s);
-	}
+      if (key->subkeys)
+        {
+          /* First check whether any subkey has the subkey_match set
+           * and use that one.  If that is not the case we use the
+           * fingerprint of the primary key or if that does not exist
+           * the keyid.  */
+          for (subkey = key->subkeys; subkey; subkey = subkey->next)
+            if (subkey->subkey_match)
+              break;
+          if (subkey && subkey->fpr)
+            {
+              if (!err)
+                err = add_arg (gpg, "-u");
+              if (!err)
+                err = add_arg_pfx (gpg, subkey->fpr, "!");
+            }
+          else
+            {
+              subkey = key->subkeys;  /* Reset to the primary key.  */
+              if ((s=subkey->fpr) || (s=subkey->keyid))
+                {
+                  if (!err)
+                    err = add_arg (gpg, "-u");
+                  if (!err)
+                    err = add_arg (gpg, s);
+                }
+            }
+        }
       gpgme_key_unref (key);
       if (err)
         break;
@@ -2839,21 +2885,23 @@ gpg_add_algo_usage_expire (engine_gpg_t gpg,
   gpg_error_t err;
 
   /* This condition is only required to allow the use of gpg < 2.1.16 */
-  if (algo
+  if ((algo && *algo)
       || (flags & (GPGME_CREATE_SIGN | GPGME_CREATE_ENCR
                    | GPGME_CREATE_CERT | GPGME_CREATE_AUTH
-                   | GPGME_CREATE_NOEXPIRE))
+                   | GPGME_CREATE_GROUP | GPGME_CREATE_NOEXPIRE))
       || expires)
     {
-      err = add_arg (gpg, algo? algo : "default");
+      err = add_arg (gpg, (algo && *algo)? algo : "default");
       if (!err)
         {
-          char tmpbuf[5*4+1];
-          snprintf (tmpbuf, sizeof tmpbuf, "%s%s%s%s",
+          char tmpbuf[6*5+1];
+          snprintf (tmpbuf, sizeof tmpbuf, "%s%s%s%s%s",
                     (flags & GPGME_CREATE_SIGN)? " sign":"",
                     (flags & GPGME_CREATE_ENCR)? " encr":"",
                     (flags & GPGME_CREATE_CERT)? " cert":"",
-                    (flags & GPGME_CREATE_AUTH)? " auth":"");
+                    (flags & GPGME_CREATE_AUTH)? " auth":"",
+                    ((flags & GPGME_CREATE_GROUP)
+                     && have_option_gen_group_key (gpg))? " group":"");
           err = add_arg (gpg, *tmpbuf? tmpbuf : "default");
         }
       if (!err)
@@ -4173,6 +4221,29 @@ gpg_setownertrust (void *engine, gpgme_key_t key, const char *value)
 }
 
 
+static gpgme_error_t
+gpg_getdirect (void *engine, const char *argv[],
+               gpgme_data_t dataout, unsigned int flags)
+{
+  engine_gpg_t gpg = engine;
+  gpgme_error_t err = 0;
+  int i;
+
+  if (!engine || !argv || !dataout || flags)
+    return gpg_error (GPG_ERR_INV_VALUE);
+
+  for (i=0; !err && argv[i]; i++)
+    if ((err = add_arg (gpg, argv[i])))
+      return err;
+
+  err = add_data (gpg, dataout, 1, 1);
+  if (!err)
+    err = start (gpg);
+
+  return err;
+}
+
+
 
 struct engine_ops _gpgme_engine_ops_gpg =
   {
@@ -4214,6 +4285,7 @@ struct engine_ops _gpgme_engine_ops_gpg =
     gpg_setexpire,
     gpg_setownertrust,
     NULL,               /* opassuan_transact */
+    gpg_getdirect,
     NULL,		/* conf_load */
     NULL,		/* conf_save */
     NULL,		/* conf_dir */

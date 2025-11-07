@@ -86,7 +86,8 @@ gpgme_error_t _gpgme_verify_status_handler (void *priv,
 
 /* From decrypt.c.  */
 gpgme_error_t _gpgme_op_decrypt_init_result (gpgme_ctx_t ctx,
-                                             gpgme_data_t plaintext);
+                                             gpgme_data_t plaintext,
+                                             gpgme_decrypt_flags_t flags);
 gpgme_error_t _gpgme_decrypt_status_handler (void *priv,
 					     gpgme_status_code_t code,
 					     char *args);
@@ -146,7 +147,7 @@ gpgme_error_t _gpgme_key_add_subkey (gpgme_key_t key,
 				     gpgme_subkey_t *r_subkey);
 gpgme_error_t _gpgme_key_append_name (gpgme_key_t key,
                                       const char *src, int convert);
-gpgme_key_sig_t _gpgme_key_add_sig (gpgme_key_t key, char *src);
+gpgme_key_sig_t _gpgme_key_add_uid_sig (gpgme_key_t key, char *src);
 gpgme_error_t _gpgme_key_add_rev_key (gpgme_key_t key, const char *src);
 
 
@@ -154,17 +155,6 @@ gpgme_error_t _gpgme_key_add_rev_key (gpgme_key_t key, const char *src);
 /* From keylist.c.  */
 void _gpgme_op_keylist_event_cb (void *data, gpgme_event_io_t type,
 				 void *type_data);
-
-
-/* From trust-item.c.  */
-
-/* Create a new trust item.  */
-gpgme_error_t _gpgme_trust_item_new (gpgme_trust_item_t *r_item);
-
-
-/* From trustlist.c.  */
-void _gpgme_op_trustlist_event_cb (void *data, gpgme_event_io_t type,
-				   void *type_data);
 
 
 /* From version.c.  */

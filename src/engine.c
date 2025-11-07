@@ -934,18 +934,6 @@ _gpgme_engine_op_sign (engine_t engine, gpgme_data_t in, gpgme_data_t out,
 
 
 gpgme_error_t
-_gpgme_engine_op_trustlist (engine_t engine, const char *pattern)
-{
-  (void)pattern;
-
-  if (!engine)
-    return gpg_error (GPG_ERR_INV_VALUE);
-
-  return gpg_error (GPG_ERR_NOT_IMPLEMENTED);
-}
-
-
-gpgme_error_t
 _gpgme_engine_op_verify (engine_t engine, gpgme_verify_flags_t flags,
                          gpgme_data_t sig, gpgme_data_t signed_text,
                          gpgme_data_t plaintext, gpgme_ctx_t ctx)
@@ -996,6 +984,26 @@ _gpgme_engine_op_assuan_transact (engine_t engine,
                                             data_cb, data_cb_value,
                                             inq_cb, inq_cb_value,
                                             status_cb, status_cb_value);
+}
+
+
+/* Direct invocation of the engine's tool.
+ *
+ * For example with argv[0] = "--gen-random" and argv[1] = "30" the
+ * gpg engine puts 30 bytes zbase32 encoded random into DATAOUT.
+ * FLAGS must be passed as 0 for now.
+ */
+gpgme_error_t
+_gpgme_engine_op_getdirect (engine_t engine, const char *argv[],
+                            gpgme_data_t dataout, unsigned int flags)
+{
+  if (!engine)
+    return gpg_error (GPG_ERR_INV_VALUE);
+
+  if (!engine->ops->getdirect)
+    return gpg_error (GPG_ERR_NOT_IMPLEMENTED);
+
+  return (*engine->ops->getdirect) (engine->engine, argv, dataout, flags);
 }
 
 
