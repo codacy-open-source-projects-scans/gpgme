@@ -38,6 +38,7 @@
 #include <stdint.h>
 #include <process.h>
 
+#include "util.h"
 #include "priv-io.h"
 
 /* #define DEBUG_TO_FILE 1 */
@@ -249,7 +250,7 @@ my_spawn (wchar_t **argv, struct spawn_fd_item_s *fd_list, unsigned int flags)
           handle = LoadLibraryA ("user32.dll");
           if (handle)
             {
-              func = GetProcAddress (handle, "AllowSetForegroundWindow");
+              func = (void *)GetProcAddress (handle, "AllowSetForegroundWindow");
               if (!func)
                 FreeLibrary (handle);
             }
