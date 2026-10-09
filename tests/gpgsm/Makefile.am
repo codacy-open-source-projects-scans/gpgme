@@ -19,11 +19,11 @@
 
 ## Process this file with automake to produce Makefile.in
 
-GPGSM = gpgsm
-GPG_AGENT = gpg-agent
+GPGSM = gpgsm$(EXEEXT)
+GPG_AGENT = gpg-agent$(EXEEXT)
 
 GNUPGHOME=$(abs_builddir)
-TESTS_ENVIRONMENT = GNUPGHOME=$(GNUPGHOME) LC_ALL=C GPG_AGENT_INFO= \
+TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) GNUPGHOME=$(GNUPGHOME) LC_ALL=C GPG_AGENT_INFO= \
                     top_srcdir=$(top_srcdir)
 
 noinst_HEADERS = t-support.h
@@ -38,7 +38,7 @@ EXTRA_DIST = cert_dfn_pca01.der cert_dfn_pca15.der cert_g10code_test1.der \
 
 AM_CPPFLAGS = -I$(top_builddir)/src @GPG_ERROR_CFLAGS@
 AM_LDFLAGS = -no-install
-LDADD = ../../src/libgpgme.la @LDADD_FOR_TESTS_KLUDGE@
+LDADD = ../../src/libgpgme.la @GPG_ERROR_LIBS@ @LDADD_FOR_TESTS_KLUDGE@
 
 # We don't run t-genkey in the test suite, because it takes too long
 # and needs a working pinentry.

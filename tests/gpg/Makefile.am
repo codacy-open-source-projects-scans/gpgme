@@ -19,11 +19,11 @@
 
 ## Process this file with automake to produce Makefile.in
 
-GPG = gpg
-GPG_AGENT = gpg-agent
+GPG = gpg$(EXEEXT)
+GPG_AGENT = gpg-agent$(EXEEXT)
 
 GNUPGHOME=$(abs_builddir)
-TESTS_ENVIRONMENT = GNUPGHOME=$(GNUPGHOME) LC_ALL=C GPG_AGENT_INFO= \
+TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) GNUPGHOME=$(GNUPGHOME) LC_ALL=C GPG_AGENT_INFO= \
                     top_srcdir=$(top_srcdir)
 
 # The keylist tests must come after the import and the edit test.
@@ -61,7 +61,7 @@ private_keys = \
 EXTRA_DIST = initial.test final.test \
         pubdemo.asc secdemo.asc cipher-1.asc cipher-2.asc \
 	cipher-3.asc cipher-no-sig.asc \
-	geheim.txt pubkey-1.asc seckey-1.asc pinentry $(private_keys) \
+	geheim.txt pubkey-1.asc seckey-1.asc $(private_keys) \
 	gpg.conf.in ownertrust.txt
 
 BUILT_SOURCES = gpg.conf gpg-agent.conf pubring-stamp \
@@ -91,13 +91,14 @@ endif
 
 noinst_PROGRAMS = $(c_tests) $(tests_skipped)
 
+noinst_PROGRAMS += pinentry$(EXEEXT)
 
 clean-local:
 	-$(TESTS_ENVIRONMENT) $(top_srcdir)/tests/start-stop-agent --stop
 	-rm -fR private-keys-v1.d
 
 gpg-sample.stamp: $(srcdir)/$(private_keys)
-	-$(TESTS_ENVIRONMENT) gpgconf --kill all
+	-$(TESTS_ENVIRONMENT) gpgconf$(EXEEXT) --kill all
 	$(MKDIR_P) ./private-keys-v1.d
 	for k in $(private_keys); do \
 	  cp $(srcdir)/$$k private-keys-v1.d/$$k.key; \
@@ -122,5 +123,10 @@ gpg-agent.conf:
 # smartcard reader (error might be: Unusable secret key)
 	echo disable-scdaemon >> ./gpg-agent.conf
 
+pinentry.o: $(srcdir)/pinentry.c
+	$(CC) $(CFLAGS) -c $(srcdir)/pinentry.c
+
+pinentry$(EXEEXT): pinentry.o
+	$(CC) -o $@ pinentry.o
 
 # end-of-file

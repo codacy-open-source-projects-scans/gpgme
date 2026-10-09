@@ -31,8 +31,8 @@ min_automake_version="1.14"
 # for the LT versions.
 m4_define([mym4_package],[gpgme])
 m4_define([mym4_major], [2])
-m4_define([mym4_minor], [0])
-m4_define([mym4_micro], [2])
+m4_define([mym4_minor], [2])
+m4_define([mym4_micro], [1])
 
 # Below is m4 magic to extract and compute the git revision number,
 # the decimalized short revision number, a beta version string and a
@@ -55,9 +55,9 @@ AC_INIT([mym4_package],[mym4_version],[https://bugs.gnupg.org])
 #   (Interfaces added:			AGE++)
 #   (Interfaces removed:		AGE=0)
 #
-LIBGPGME_LT_CURRENT=45
-LIBGPGME_LT_AGE=0
-LIBGPGME_LT_REVISION=1
+LIBGPGME_LT_CURRENT=47
+LIBGPGME_LT_AGE=2
+LIBGPGME_LT_REVISION=0
 ################################################
 
 AC_SUBST(LIBGPGME_LT_CURRENT)
@@ -729,7 +729,7 @@ AH_BOTTOM([
 #define GPG_ERR_ENABLE_GETTEXT_MACROS 1
 
 #define CRIGHTBLURB "Copyright (C) 2000 Werner Koch\n" \
-                    "Copyright (C) 2001--2025 g10 Code GmbH\n"
+                    "Copyright (C) 2001--2026 g10 Code GmbH\n"
 ])
 
 

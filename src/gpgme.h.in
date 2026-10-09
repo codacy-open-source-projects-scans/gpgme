@@ -1,6 +1,6 @@
 /* gpgme.h - Public interface to GnuPG Made Easy.                   -*- c -*-
  * Copyright (C) 2000 Werner Koch (dd9jn)
- * Copyright (C) 2001-2025 g10 Code GmbH
+ * Copyright (C) 2001-2026 g10 Code GmbH
  *
  * This file is part of GPGME.
  *
@@ -428,6 +428,7 @@ typedef unsigned int gpgme_export_mode_t;
 /* The available signature notation flags.  */
 #define GPGME_SIG_NOTATION_HUMAN_READABLE	1
 #define GPGME_SIG_NOTATION_CRITICAL		2
+#define GPGME_SIG_NOTATION_UNPROTECTED          4
 
 typedef unsigned int gpgme_sig_notation_flags_t;
 
@@ -508,8 +509,11 @@ struct _gpgme_sig_notation
   /* Notation data is critical.  */
   unsigned int critical : 1;
 
+  /* Notaion data is unprotected (unsigned).  */
+  unsigned int unprotected : 1;
+
   /* Internal to GPGME, do not use.  */
-  int _unused : 30;
+  int _unused : 29;
 };
 
 
@@ -1727,6 +1731,14 @@ struct _gpgme_signature
   /* If non-NULL, a possible incomplete key object with the data
    * available for the signature.  */
   gpgme_key_t key;
+
+  /* If protocol is GPGME_PROTOCOL_CMS, this string may contain the
+     issuer serial.  */
+  char *issuer_serial;
+
+  /* If protocol is GPGME_PROTOCOL_CMS, this string may contain the
+     issuer name.  */
+  char *issuer_name;
 };
 typedef struct _gpgme_signature *gpgme_signature_t;
 
@@ -2733,7 +2745,8 @@ typedef enum
     GPGME_STATUS_VERIFICATION_COMPLIANCE_MODE = 100,
     GPGME_STATUS_CANCELED_BY_USER = 101,
     GPGME_STATUS_ENCRYPTION_COMPLIANCE_MODE = 102,
-    GPGME_STATUS_SESSION_HASH = 103
+    GPGME_STATUS_SESSION_HASH = 103,
+    GPGME_STATUS_SIGINFO = 104
   }
 gpgme_status_code_t;
 
